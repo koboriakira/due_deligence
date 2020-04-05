@@ -14,8 +14,9 @@ RUN apt-get update \
 ADD ./docker/mysql mysql
 RUN service mysql start \
   && mysql -uroot < mysql/init.ddl \
-  && mysql -uroot due_deligence < mysql/create_xbrl.sql \
-  && mysql -uroot -proot -h localhost due_deligence < mysql/xbrl_dump
+  && mysql -uroot db < mysql/create_company.sql \
+  && mysql -uroot db < mysql/create_deligence.sql \
+  && mysql -uroot -proot -h localhost db < mysql/mysqldump_all_data
 
 ADD ./requirements.txt requirements.txt
 RUN pip install --upgrade pip \

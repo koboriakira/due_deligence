@@ -3,7 +3,7 @@ import logging
 from datetime import date
 from copy import copy
 
-from get_edinet import search_company_list, search_company_list_by_sec_code
+from get_company import search_company_list, search_company_list_by_sec_code
 import analyze_financial_reports
 from config import TARGET_COMPANY_LIST, DETAIL, WAIT_TIME
 
