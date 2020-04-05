@@ -5,6 +5,8 @@ from download_file import download_file
 from get_xbrl import get_xbrl
 from deligence_model import DeligenceModel
 from company import Company
+from scrape_stock_price import scrape_stock_price
+import company_repository
 
 ITEMS = {
     '当期営業利益': ['jppfs_cor:OperatingIncome', 'CurrentYearDuration'],
@@ -13,7 +15,8 @@ ITEMS = {
     '当期その他の資産合計': ['jppfs_cor:InvestmentsAndOtherAssets', 'CurrentYearInstant'],
     '当期流動負債合計': ['jppfs_cor:CurrentLiabilities', 'CurrentYearInstant'],
     '当期固定負債合計': ['jppfs_cor:NoncurrentLiabilities', 'CurrentYearInstant'],
-    '当期発行済株式総数': ['jpcrp_cor:TotalNumberOfIssuedSharesSummaryOfBusinessResults', 'CurrentYearInstant_NonConsolidatedMember']
+    '当期純資産合計': ['jppfs_cor:NetAssets', 'CurrentYearInstant'],
+    '当期発行済株式総数': ['jpcrp_cor:TotalNumberOfIssuedSharesSummaryOfBusinessResults', 'CurrentYearInstant_NonConsolidatedMember'],
 }
 
 ITEMS_2 = {
@@ -23,7 +26,6 @@ ITEMS_2 = {
 
 def analyze(company: Company):
     detail_url = company.generate_doc_url()
-    print(detail_url)
 
     # XBRLの取得
     path = download_file(detail_url)
@@ -35,13 +37,20 @@ def analyze(company: Company):
     edinet_obj = parser.parse_file(xbrl_path)
 
     # XBRLの解析
-    value_dict = get_value_dict(edinet_obj)
-    if not value_dict:
+    xbrl_dict = get_value_dict(edinet_obj)
+    if not xbrl_dict:
         logging.error('エラー！ XBRLの解析ができませんでした')
         return
 
-    deligence_model = DeligenceModel(value_dict)
-    print('1株あたりの価値', deligence_model.get_value_per_share(), '(円)')
+    deligence_model = DeligenceModel(xbrl_dict)
+    company_repository.update_deligence(company, deligence_model)
+    print('1株あたりの価値', deligence_model.value_per_share(), '(円)')
+
+    stock_price = scrape_stock_price(company)
+    if not stock_price is None:
+        print('株価', stock_price, '(円)')
+        print('安全圏', underpriced(stock_price,
+                                 deligence_model.value_per_share()), '(%)')
 
 
 def get_value_dict(edinet_obj):
@@ -57,3 +66,10 @@ def get_value_dict(edinet_obj):
         return value_dict
     except AttributeError as e:
         return False
+
+
+def underpriced(stock_price, value_per_share):
+    """
+    安全圏、割安度を確認
+    """
+    return round(100 * stock_price / value_per_share, 0)

@@ -5,6 +5,7 @@ from datetime import date, timedelta
 from typing import Dict, List
 
 from company import Company
+import company_repository
 
 
 def search_company_list(from_date_str: str, end_date_str: str):
@@ -24,6 +25,14 @@ def search_company_list(from_date_str: str, end_date_str: str):
     return result
 
 
+def search_company_list_by_sec_code(sec_code: str):
+    """
+    指定された企業コードの有価証券報告書をDBから調べます。
+    もし見つからない場合は、まずDBへの保存を先にやってください。
+    """
+    return company_repository.search_company_list_by_sec_code(sec_code)
+
+
 def search_company(target_date: date):
     list_url = get_list_url(str(target_date))
     response = calm_requests.get(list_url)
@@ -31,11 +40,25 @@ def search_company(target_date: date):
 
     company_list = []
     for result in json_dict['results']:
-        company = Company(result)
-        if company.is_target_financial_report():
+        company = generate_company(result, target_date)
+        if company.is_financial_report():
+            company_repository.insert(company)
             company_list.append(company)
 
     return company_list
+
+
+def generate_company(result, date):
+    doc_id = result['docID']
+    seq_number = result['seqNumber']
+    edinet_code = result['edinetCode']
+    sec_code = None
+    if type(result['secCode']) is str:
+        sec_code = result['secCode'][0:len(result['secCode']) - 1]
+    form_code = result['formCode']
+    doc_type_code = result['docTypeCode']
+    filer_name = result['filerName']
+    return Company(doc_id, date, seq_number, edinet_code, sec_code, form_code, doc_type_code, filer_name)
 
 
 def get_list_url(date: str):

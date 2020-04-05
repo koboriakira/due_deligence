@@ -5,21 +5,40 @@ TARGET_FORM_CODE_LIST = [
     # '043000',  # 四半期報告書
 ]
 
+# 同じ030000でも350「大量保有報告書」の場合もあるので絞り込む
+TARGET_DOC_TYPE_CODE = '120'
+
 
 class Company:
-    def __init__(self, data):
+    def __init__(self, doc_id, date, seq_number, edinet_code, sec_code, form_code, doc_type_code, filer_name):
         super().__init__()
-        self.filer_name = data['filerName']
-        self.doc_id = data['docID']
-        self.form_code = data['formCode']
-        if type(data['secCode']) is str:
-            self.sec_code = data['secCode'][0:len(data['secCode']) - 1]
-        else:
-            self.sec_code = ''
+        self.doc_id = doc_id
+        self.date = date
+        self.seq_number = seq_number
+        self.edinet_code = edinet_code
+        self.sec_code = sec_code
+        self.form_code = form_code
+        self.doc_type_code = doc_type_code
+        self.filer_name = filer_name
 
-    def is_target_financial_report(self):
-        return self.form_code in TARGET_FORM_CODE_LIST and self.sec_code in TARGET_COMPANY_LIST
+    def is_financial_report(self):
+        return self.form_code in TARGET_FORM_CODE_LIST and self.doc_type_code == TARGET_DOC_TYPE_CODE
 
     def generate_doc_url(self):
         # ex.) https://disclosure.edinet-fsa.go.jp/api/v1/documents/S100IA9D?type=1
         return 'https://disclosure.edinet-fsa.go.jp/api/v1/documents/' + self.doc_id + '?type=1'
+
+    def to_entity(self):
+        return {
+            'doc_id': self.doc_id,
+            'date': self.date,
+            'seq_number': self.seq_number,
+            'edinet_code': self.edinet_code,
+            'sec_code': self.sec_code,
+            'form_code': self.form_code,
+            'doc_type_code': self.doc_type_code,
+            'filer_name': self.filer_name,
+        }
+
+    def to_str(self):
+        return '[' + str(self.date) + '] ' + str(self.sec_code) + ' ' + self.filer_name

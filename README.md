@@ -8,7 +8,20 @@
 DockerfileをもとにDockerイメージを作成したあと、次のコマンドを実行してください。
 
 ```
-docker run -it --rm -v $(pwd)/due_deligence:/work --name due_deligence due_deligence_image python /work/script.py
+docker run -it -v $(pwd)/due_deligence:/work --name due_deligence due_deligence_image
+```
+
+まず過去3年分のEDINETの情報を集めます。長くて1時間ほどかかります。
+
+```
+python script.py 3 2017-04-01 2020-03-31
+```
+
+上記の処理が終わったら、つぎに調査したい企業コードを指定することで調査結果を確認できます。
+例は「9201 日本航空」です。
+
+```
+python script.py 2 9201
 ```
 
 ### より詳しい使い方
@@ -21,3 +34,12 @@ python /work/script.py 2020-01-01 2020-03-31 9201
 ```
 
 また取り込む有価証券報告書の対象企業コードは、 `config.py` で指定します。
+
+## その他
+
+データベースのダンプ方法
+
+```
+# mysqldump -uroot -proot -h localhost due_deligence xbrl > xbrl_dump
+# mysql -uroot -proot -h localhost due_deligence < xbrl_dump
+```
