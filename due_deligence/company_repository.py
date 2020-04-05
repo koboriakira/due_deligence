@@ -51,12 +51,19 @@ def search_by_date(date):
     return company_list
 
 
-def search_company_list_by_sec_code(sec_code: str):
-    print(sec_code)
+def search_company_list_by_sec_code(sec_code_list: List[str]):
+    print(sec_code_list)
     c = conn.cursor()
-    select_sql = SELECT_SQL + 'WHERE sec_code = \'' + \
-        sec_code + '\' AND form_code = \'030000\' AND doc_type_code = \'120\'' + ORDER_SQL
-    c.execute(select_sql)
+    format_strings = ','.join(['%s'] * len(sec_code_list))
+    print(format_strings)
+
+    select_sql = SELECT_SQL \
+        + 'WHERE ' \
+        + '  sec_code in (' + format_strings + ')' \
+        + '  AND form_code = \'030000\'' \
+        + '  AND doc_type_code = \'120\'' \
+        + ORDER_SQL
+    c.execute(select_sql, tuple(sec_code_list))
     results = c.fetchall()
 
     print(len(results))

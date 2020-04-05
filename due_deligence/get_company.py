@@ -25,12 +25,12 @@ def search_company_list(from_date_str: str, end_date_str: str):
     return result
 
 
-def search_company_list_by_sec_code(sec_code: str):
+def search_company_list_by_sec_code(sec_code_list: List[str]):
     """
     指定された企業コードの有価証券報告書をDBから調べます。
     もし見つからない場合は、まずDBへの保存を先にやってください。
     """
-    return company_repository.search_company_list_by_sec_code(sec_code)
+    return company_repository.search_company_list_by_sec_code(sec_code_list)
 
 
 def search_company(target_date: date):

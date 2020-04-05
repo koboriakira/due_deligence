@@ -33,8 +33,8 @@ def pattern2():
     if len(sys.argv) < 3:
         logging.error('エラー 企業コードを指定してください')
 
-    sec_code = sys.argv[2]
-    company_list = search_company_list_by_sec_code(sec_code)
+    sec_code_list = sys.argv[2].split(',')
+    company_list = search_company_list_by_sec_code(sec_code_list)
     analyze_financial_reports.execute(company_list)
 
 
