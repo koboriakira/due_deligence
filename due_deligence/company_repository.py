@@ -5,8 +5,8 @@ from typing import List
 from datetime import date
 from deligence_model import DeligenceModel
 
-INSERT_SQL = 'INSERT INTO xbrl(doc_id, date, seq_number, edinet_code, sec_code, form_code, doc_type_code, filer_name) VALUES(%(doc_id)s, %(date)s, %(seq_number)s, %(edinet_code)s, %(sec_code)s, %(form_code)s, %(doc_type_code)s, %(filer_name)s)'
-SELECT_SQL = 'SELECT doc_id, date, seq_number, edinet_code, sec_code, form_code, doc_type_code, filer_name FROM due_deligence.xbrl '
+INSERT_SQL = 'INSERT INTO company(doc_id, date, seq_number, edinet_code, sec_code, form_code, doc_type_code, filer_name) VALUES(%(doc_id)s, %(date)s, %(seq_number)s, %(edinet_code)s, %(sec_code)s, %(form_code)s, %(doc_type_code)s, %(filer_name)s)'
+SELECT_SQL = 'SELECT doc_id, date, seq_number, edinet_code, sec_code, form_code, doc_type_code, filer_name FROM company '
 ORDER_SQL = ' ORDER BY sec_code, date DESC'
 
 TEST_DATA = {
@@ -20,7 +20,7 @@ TEST_DATA = {
     'filer_name': '日本航空',
 }
 
-conn = MySQLdb.connect(db='due_deligence', user='admin',
+conn = MySQLdb.connect(db='db', user='admin',
                        passwd='admin', charset='utf8mb4')
 
 

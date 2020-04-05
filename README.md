@@ -40,6 +40,6 @@ python /work/script.py 2020-01-01 2020-03-31 9201
 データベースのダンプ方法
 
 ```
-# mysqldump -uroot -proot -h localhost due_deligence xbrl > xbrl_dump
-# mysql -uroot -proot -h localhost due_deligence < xbrl_dump
+# mysqldump -uroot -proot -h localhost -t db > mysqldump_all_data
+# mysql -uroot -proot -h localhost db < mysqldump_all_data
 ```

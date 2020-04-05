@@ -34,6 +34,10 @@ def search_company_list_by_sec_code(sec_code: str):
 
 
 def search_company(target_date: date):
+    company_list = company_repository.search_by_date(target_date)
+    if not company_list is None and len(company_list) > 0:
+        return company_list
+
     list_url = get_list_url(str(target_date))
     response = calm_requests.get(list_url)
     json_dict = json.loads(response.text)
