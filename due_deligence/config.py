@@ -57,3 +57,7 @@ TARGET_COMPANY_LIST = [
     '7921',  # ＴＡＫＡＲＡ＆ＣＯＭＰＡＮＹ
     '7607',  # 進和
 ]
+
+DETAIL = False
+
+WAIT_TIME = 1

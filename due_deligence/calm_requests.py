@@ -1,12 +1,14 @@
 import requests
 import time
 
+from config import WAIT_TIME
+
 session = requests.Session()
 
 
-def get(url: str) -> requests.Response:
+def get(url: str):
     """
     必ず1秒待つことでサーバ負荷を抑える
     """
-    time.sleep(1)
+    time.sleep(WAIT_TIME)
     return session.get(url, stream=True)

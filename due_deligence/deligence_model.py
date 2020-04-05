@@ -1,15 +1,19 @@
+from config import DETAIL
+
+
 class DeligenceModel:
-    def __init__(self, value_dict):
+    def __init__(self, xbrl_dict):
         super().__init__()
-        self.current_year_operationg_income = int(value_dict['当期営業利益'])
-        self.prior_1year_operationg_income = int(value_dict['前期営業利益'])
-        self.current_year_current_assets = int(value_dict['当期流動資産合計'])
+        self.current_year_operationg_income = int(xbrl_dict['当期営業利益'])
+        self.prior_1year_operationg_income = int(xbrl_dict['前期営業利益'])
+        self.current_year_current_assets = int(xbrl_dict['当期流動資産合計'])
         self.current_year_investments_and_other_assets = int(
-            value_dict['当期その他の資産合計'])
-        self.current_year_current_liabilities = int(value_dict['当期流動負債合計'])
-        self.current_year_noncurrent_liabilities = int(value_dict['当期固定負債合計'])
+            xbrl_dict['当期その他の資産合計'])
+        self.current_year_current_liabilities = int(xbrl_dict['当期流動負債合計'])
+        self.current_year_noncurrent_liabilities = int(xbrl_dict['当期固定負債合計'])
+        self.current_year_net_assets = int(xbrl_dict['当期純資産合計'])
         self.current_year_total_number_of_issued_shares = int(
-            value_dict['当期発行済株式総数'])
+            xbrl_dict['当期発行済株式総数'])
 
     def caluculate_company_value(self):
         # 前期、今期の営業利益をもとに、事業価値を出す
@@ -29,8 +33,15 @@ class DeligenceModel:
         return business_value + property_value - self.current_year_noncurrent_liabilities
 
     # 一株あたりの価値を出す
-    def get_value_per_share(self):
+    def value_per_share(self):
         return int(self.caluculate_company_value() / self.current_year_total_number_of_issued_shares)
 
+    # 自己資本比率
+    def capital_ratio(self):
+        sum = self.current_year_current_liabilities + \
+            self.current_year_noncurrent_liabilities + self.current_year_net_assets
+        return int(round(100 * (self.current_year_net_assets / sum)))
+
     def print_billion(self, title: str, value: int):
-        print(title, value / 100000000, '(億円)')
+        if DETAIL:
+            print(title, value / 100000000, '(億円)')
