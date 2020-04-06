@@ -77,8 +77,8 @@ def contruct_by_xbrl_dict(doc_id, xbrl_dict):
         'current_year_current_liabilities': million(xbrl_dict['当期流動負債合計']),
         'current_year_noncurrent_liabilities': million(xbrl_dict['当期固定負債合計']),
         'current_year_net_assets': million(xbrl_dict['当期純資産合計']),
-        'current_year_total_number_of_issued_shares': int(
-            xbrl_dict['当期発行済株式総数']),
+        'current_year_total_number_of_issued_shares': int(float((
+            xbrl_dict['当期発行済株式総数']))),
     }
     return DeligenceModel(data)
 

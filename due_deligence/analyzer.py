@@ -76,6 +76,9 @@ def get_value_dict(edinet_obj):
             logging.debug(key, context_ref)
             item_value = edinet_obj.get_data_by_context_ref(
                 key, context_ref).get_value()
+            if item_value is None:
+                logging.warning('取得できない項目があります:', item_name)
+                return False
             value_dict[item_name] = item_value
         return value_dict
     except AttributeError as e:

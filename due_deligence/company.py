@@ -22,7 +22,7 @@ class Company:
         self.filer_name = filer_name
 
     def is_financial_report(self):
-        return self.form_code in TARGET_FORM_CODE_LIST and self.doc_type_code == TARGET_DOC_TYPE_CODE
+        return self.form_code in TARGET_FORM_CODE_LIST and self.doc_type_code == TARGET_DOC_TYPE_CODE and self.sec_code is not None
 
     def generate_doc_url(self):
         # ex.) https://disclosure.edinet-fsa.go.jp/api/v1/documents/S100IA9D?type=1

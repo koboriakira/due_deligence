@@ -29,11 +29,11 @@ def pattern2():
     先にpattern3を実行してデータの整備をする必要があります。
     """
     logging.info('pattern2')
-    DETAIL = True
-    if len(sys.argv) < 3:
-        logging.error('エラー 企業コードを指定してください')
 
-    sec_code_list = sys.argv[2].split(',')
+    sec_code_list = TARGET_COMPANY_LIST
+    if len(sys.argv) >= 3:
+        sec_code_list = sys.argv[2].split(',')
+
     company_list = search_company_list_by_sec_code(sec_code_list)
     analyze_financial_reports.execute(company_list)
 
