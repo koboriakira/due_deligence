@@ -1,4 +1,4 @@
-from config import TARGET_COMPANY_LIST
+from due_deligence.config import TARGET_COMPANY_LIST
 
 TARGET_FORM_CODE_LIST = [
     '030000',  # 有価証券報告書

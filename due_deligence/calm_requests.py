@@ -1,7 +1,7 @@
 import requests
 import time
 
-from config import WAIT_TIME
+from due_deligence.config import WAIT_TIME
 
 session = requests.Session()
 

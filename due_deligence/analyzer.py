@@ -1,12 +1,12 @@
 import logging
 from edinet_xbrl.edinet_xbrl_parser import EdinetXbrlParser
 
-from download_file import download_file
-from get_xbrl import get_xbrl
-import deligence_model
-from company import Company
-from scrape_stock_price import scrape_stock_price
-import deligence_repository
+from due_deligence.download_file import download_file
+from due_deligence.get_xbrl import get_xbrl
+from due_deligence import deligence_model
+from due_deligence.company import Company
+from due_deligence.scrape_stock_price import scrape_stock_price
+from due_deligence import deligence_repository
 
 ITEMS = {
     '当期営業利益': ['jppfs_cor:OperatingIncome', 'CurrentYearDuration'],

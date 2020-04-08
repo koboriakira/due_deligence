@@ -1,9 +1,10 @@
 
 import MySQLdb
-from company import Company
 from typing import List
 from datetime import date
-from deligence_model import DeligenceModel
+
+from due_deligence.company import Company
+from due_deligence.deligence_model import DeligenceModel
 
 INSERT_SQL = 'INSERT INTO company(doc_id, date, seq_number, edinet_code, sec_code, form_code, doc_type_code, filer_name) VALUES(%(doc_id)s, %(date)s, %(seq_number)s, %(edinet_code)s, %(sec_code)s, %(form_code)s, %(doc_type_code)s, %(filer_name)s)'
 SELECT_SQL = 'SELECT doc_id, date, seq_number, edinet_code, sec_code, form_code, doc_type_code, filer_name FROM company '

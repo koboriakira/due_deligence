@@ -1,7 +1,7 @@
 import random
 import string
 from typing import List
-import calm_requests
+from due_deligence import calm_requests
 
 # @see http://stackoverflow.com/questions/16694907/how-to-download-large-file-in-python-with-requests-py
 

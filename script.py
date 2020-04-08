@@ -3,9 +3,9 @@ import logging
 from datetime import date
 from copy import copy
 
-from get_company import search_company_list, search_company_list_by_sec_code
-import analyze_financial_reports
-from config import TARGET_COMPANY_LIST, DETAIL, WAIT_TIME
+from due_deligence import get_company
+from due_deligence import analyze_financial_reports
+from due_deligence.config import TARGET_COMPANY_LIST, DETAIL, WAIT_TIME
 
 
 def pattern1():
@@ -19,7 +19,7 @@ def pattern1():
     else:
         target_date = str(date.today())
 
-    company_list = search_company_list(target_date, copy(target_date))
+    company_list = get_company.search_company_list(target_date, copy(target_date))
     analyze_financial_reports.execute(company_list)
 
 
@@ -34,7 +34,7 @@ def pattern2():
     if len(sys.argv) >= 3:
         sec_code_list = sys.argv[2].split(',')
 
-    company_list = search_company_list_by_sec_code(sec_code_list)
+    company_list = get_company.search_company_list_by_sec_code(sec_code_list)
     analyze_financial_reports.execute(company_list)
 
 
@@ -55,7 +55,7 @@ def pattern3():
     else:
         end_date_str = copy(from_date_str)
 
-    company_list = search_company_list(from_date_str, end_date_str)
+    company_list = get_company.search_company_list(from_date_str, end_date_str)
     analyze_financial_reports.execute(company_list)
 
 

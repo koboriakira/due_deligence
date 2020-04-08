@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import logging
-from company import Company
-import calm_requests
+from due_deligence.company import Company
+from due_deligence import calm_requests
 
 
 YAHOO_URL = 'https://stocks.finance.yahoo.co.jp/stocks/detail/?code=7751.T'

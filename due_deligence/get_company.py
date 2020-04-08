@@ -1,11 +1,11 @@
-import calm_requests
 import json
 import logging
 from datetime import date, timedelta
 from typing import Dict, List
 
-from company import Company
-import company_repository
+from due_deligence import calm_requests
+from due_deligence.company import Company
+from due_deligence import company_repository
 
 
 def search_company_list(from_date_str: str, end_date_str: str):

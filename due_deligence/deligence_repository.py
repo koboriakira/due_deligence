@@ -2,7 +2,7 @@ import MySQLdb
 import logging
 from typing import List
 from datetime import date
-from deligence_model import DeligenceModel
+from due_deligence.deligence_model import DeligenceModel
 
 conn = MySQLdb.connect(db='db', user='admin',
                        passwd='admin', charset='utf8mb4')

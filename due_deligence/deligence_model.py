@@ -1,5 +1,5 @@
-from config import DETAIL
 from datetime import date
+from due_deligence.config import DETAIL
 
 
 class DeligenceModel:

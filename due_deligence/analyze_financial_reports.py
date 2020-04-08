@@ -1,7 +1,7 @@
-from analyzer import analyze
 from typing import List
 import sys
-from company import Company
+from due_deligence.company import Company
+from due_deligence.analyzer import analyze
 
 
 def execute(company_list: List[Company]):
