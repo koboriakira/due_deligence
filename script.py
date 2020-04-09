@@ -59,11 +59,9 @@ if __name__ == '__main__':
     logging.basicConfig(filename='logfile/logger.log', level=logging.DEBUG)
     inject_config.init_injection()
 
-    if len(sys.argv) < 2:
-        logging.error('エラー パターンを指定してください')
-        sys.exit()
-
-    if sys.argv[1] == '1':
+    if len(sys.argv) == 1:
+        pattern1()
+    elif sys.argv[1] == '1':
         pattern1()
     elif sys.argv[1] == '2':
         pattern2()

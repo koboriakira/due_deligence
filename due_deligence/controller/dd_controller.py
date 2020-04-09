@@ -10,23 +10,25 @@ from typing import Dict, List
 
 
 def pattern1(target_date_str):
+    print(target_date_str)
     target_date = date.fromisoformat(target_date_str)
 
+    print('- xbrlファイルの一覧を取得します。')
     document_service = inject.instance(DocumentService)
     document_list = document_service.search(target_date, copy(target_date))
     documents_as_sec_code = as_sec_code(document_list)
-    print(documents_as_sec_code)
+    logging.info(documents_as_sec_code)
 
+    print('- ファイルの解析を行います。%s秒かかる想定です。' % str(len(document_list)))
     deligence_service = inject.instance(DeligenceService)
-    print(len(document_list), '秒待つ')
     doc_id_list = get_doc_id_list(document_list)
     report_map = deligence_service.search(doc_id_list)
-    print(report_map)
+    logging.info(report_map)
 
     # todo: service化する？
-    print(len(documents_as_sec_code.keys()), '秒待つ')
+    print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
+          str(len(documents_as_sec_code.keys())))
     share_price_map = share_price_search(documents_as_sec_code.keys())
-    print(share_price_map)
 
     result_json = create_due_deligence_json(
         documents_as_sec_code, report_map, share_price_map)
@@ -35,21 +37,22 @@ def pattern1(target_date_str):
 
 
 def pattern2(sec_code_list: List[str]):
+    print('- xbrlファイルの一覧を取得します。')
     document_service = inject.instance(DocumentService)
     document_list = document_service.search_by_sec_code(sec_code_list)
     documents_as_sec_code = as_sec_code(document_list)
-    print(documents_as_sec_code)
+    logging.info(documents_as_sec_code)
 
+    print('- ファイルの解析を行います。%s秒かかる想定です。' % str(len(document_list)))
     deligence_service = inject.instance(DeligenceService)
-    print(len(document_list), '秒待つ')
     doc_id_list = get_doc_id_list(document_list)
     report_map = deligence_service.search(doc_id_list)
-    print(report_map)
+    logging.info(report_map)
 
     # todo: service化する？
-    print(len(documents_as_sec_code.keys()), '秒待つ')
+    print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
+          str(len(documents_as_sec_code.keys())))
     share_price_map = share_price_search(documents_as_sec_code.keys())
-    print(share_price_map)
 
     result_json = create_due_deligence_json(
         documents_as_sec_code, report_map, share_price_map)
@@ -63,7 +66,7 @@ def pattern3(from_date_str: str, end_date_str: str):
 
     print('- xbrlファイルの一覧を取得します。')
     document_service = inject.instance(DocumentService)
-    document_list = document_service.search(from_date, copy(end_date))
+    document_list = document_service.search(from_date, end_date)
     documents_as_sec_code = as_sec_code(document_list)
     logging.info(documents_as_sec_code)
 
