@@ -1,4 +1,3 @@
-from due_deligence.interactor.due_deligence_requester import DueDeligenceRequester
 from due_deligence.domain_model.deligence import Deligence, DeligenceService
 from due_deligence.domain_model.document import Document, DocumentService
 import sys
@@ -55,7 +54,7 @@ def pattern2(sec_code_list: List[str]):
     result_json = create_due_deligence_json(
         documents_as_sec_code, report_map, share_price_map)
     presenter = inject.instance(ResultPresenter)
-    presenter.print(result_json, file_name='selected.csv')
+    presenter.print(result_json, file_name='selected')
 
 
 def pattern3(from_date_str: str, end_date_str: str):

@@ -5,13 +5,9 @@ from copy import copy
 import inject
 
 from due_deligence.controller import dd_controller
-from due_deligence import get_company
-from due_deligence.interactor import analyze_financial_reports
 from due_deligence.config import TARGET_COMPANY_LIST, DETAIL, WAIT_TIME
 from due_deligence.adapter.document import DocumentRepository
 from due_deligence.adapter.repo.document.document_mysql_repository import DocumentMysqlRepository
-from due_deligence.interactor.analyze_requestor import AnalyzeRequestor
-from due_deligence.interactor.analyze_generator import AnalyzeGenerator
 from due_deligence.domain_model.document import DocumentService
 from due_deligence.adapter.document import SimpleDocumentService
 from due_deligence.domain_model.deligence import DeligenceService
@@ -77,14 +73,7 @@ def config(binder):
     binder.bind_to_constructor(XbrlDownloader, XbrlObjDownloader)
     binder.bind_to_constructor(ReportRepository, ReportMysqlRepository)
     binder.bind_to_constructor(ResultPresenter, ResultScreenPresenter)
-    mysql_connection_param = {
-        'db': 'db',
-        'user': 'admin',
-        'passwd': 'admin',
-        'charset': 'utf8mb4'
-    }
     binder.bind_to_constructor(DocumentRepository, DocumentMysqlRepository)
-    binder.bind_to_constructor(AnalyzeRequestor, AnalyzeGenerator)
 
 
 if __name__ == '__main__':
