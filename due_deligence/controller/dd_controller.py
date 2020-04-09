@@ -9,75 +9,74 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, List
 
 
-def pattern1(target_date_str):
-    print(target_date_str)
-    target_date = date.fromisoformat(target_date_str)
+class DDController:
+    def __init__(self, from_date_str=None, end_date_str=None, sec_code_list=[], print_result=True):
+        self._from_date = date.today()
+        if from_date_str is not None:
+            self._from_date = date.fromisoformat(from_date_str)
+        self._end_date = copy(self._from_date)
+        if end_date_str is not None:
+            self._end_date = date.fromisoformat(end_date_str)
+        self._sec_code_list = sec_code_list
+        self._print_result = print_result
 
-    print('- xbrlファイルの一覧を取得します。')
-    document_service = inject.instance(DocumentService)
-    document_list = document_service.search(target_date, copy(target_date))
-    documents_as_sec_code = as_sec_code(document_list)
-    logging.info(documents_as_sec_code)
+        self._document_service = inject.instance(DocumentService)
+        self._deligence_service = inject.instance(DeligenceService)
 
-    print('- ファイルの解析を行います。%s秒かかる想定です。' % str(len(document_list)))
-    deligence_service = inject.instance(DeligenceService)
-    doc_id_list = get_doc_id_list(document_list)
-    report_map = deligence_service.search(doc_id_list)
-    logging.info(report_map)
+    def execute(self):
+        if len(self._sec_code_list) > 0:
+            self._pattern2(self._sec_code_list)
+            return
 
-    # todo: service化する？
-    print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
-          str(len(documents_as_sec_code.keys())))
-    share_price_map = share_price_search(documents_as_sec_code.keys())
+        self._pattern1(self._from_date, self._end_date, self._print_result)
 
-    result_json = create_due_deligence_json(
-        documents_as_sec_code, report_map, share_price_map)
-    presenter = inject.instance(ResultPresenter)
-    presenter.print(result_json, file_name=target_date_str)
+    def _pattern1(self, from_date, end_date, print_result):
+        print('- xbrlファイルの一覧を取得します。')
+        document_list = self._document_service.search(from_date, end_date)
+        documents_as_sec_code = as_sec_code(document_list)
+        logging.info(documents_as_sec_code)
 
+        print('- ファイルの解析を行います。%s秒かかる想定です。' % str(len(document_list)))
+        doc_id_list = get_doc_id_list(document_list)
+        report_map = self._deligence_service.search(doc_id_list)
+        logging.info(report_map)
 
-def pattern2(sec_code_list: List[str]):
-    print('- xbrlファイルの一覧を取得します。')
-    document_service = inject.instance(DocumentService)
-    document_list = document_service.search_by_sec_code(sec_code_list)
-    documents_as_sec_code = as_sec_code(document_list)
-    logging.info(documents_as_sec_code)
+        if print_result:
+            # todo: service化する？
+            print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
+                  str(len(documents_as_sec_code.keys())))
+            share_price_map = share_price_search(documents_as_sec_code.keys())
 
-    print('- ファイルの解析を行います。%s秒かかる想定です。' % str(len(document_list)))
-    deligence_service = inject.instance(DeligenceService)
-    doc_id_list = get_doc_id_list(document_list)
-    report_map = deligence_service.search(doc_id_list)
-    logging.info(report_map)
+            result_json = create_due_deligence_json(
+                documents_as_sec_code, report_map, share_price_map)
+            presenter = inject.instance(ResultPresenter)
 
-    # todo: service化する？
-    print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
-          str(len(documents_as_sec_code.keys())))
-    share_price_map = share_price_search(documents_as_sec_code.keys())
+            file_name = str(from_date) + '_' + str(end_date)
+            presenter.print(result_json, file_name=file_name)
 
-    result_json = create_due_deligence_json(
-        documents_as_sec_code, report_map, share_price_map)
-    presenter = inject.instance(ResultPresenter)
-    presenter.print(result_json, file_name='selected')
+        print('- 完了しました!')
 
+    def _pattern2(self, sec_code_list: List[str]):
+        print('- xbrlファイルの一覧を取得します。')
+        document_list = self._document_service.search_by_sec_code(
+            sec_code_list)
+        documents_as_sec_code = as_sec_code(document_list)
+        logging.info(documents_as_sec_code)
 
-def pattern3(from_date_str: str, end_date_str: str):
-    from_date = date.fromisoformat(from_date_str)
-    end_date = date.fromisoformat(end_date_str)
+        print('- ファイルの解析を行います。%s秒かかる想定です。' % str(len(document_list)))
+        doc_id_list = get_doc_id_list(document_list)
+        report_map = self._deligence_service.search(doc_id_list)
+        logging.info(report_map)
 
-    print('- xbrlファイルの一覧を取得します。')
-    document_service = inject.instance(DocumentService)
-    document_list = document_service.search(from_date, end_date)
-    documents_as_sec_code = as_sec_code(document_list)
-    logging.info(documents_as_sec_code)
+        # todo: service化する？
+        print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
+              str(len(documents_as_sec_code.keys())))
+        share_price_map = share_price_search(documents_as_sec_code.keys())
 
-    print('- ファイルの解析を行います。%s秒かかる想定です。' % str(len(document_list)))
-    deligence_service = inject.instance(DeligenceService)
-    doc_id_list = get_doc_id_list(document_list)
-    report_map = deligence_service.search(doc_id_list)
-    logging.info(report_map)
-
-    # No presentation
-    print('- 完了しました!')
+        result_json = create_due_deligence_json(
+            documents_as_sec_code, report_map, share_price_map)
+        presenter = inject.instance(ResultPresenter)
+        presenter.print(result_json, file_name='selected')
 
 
 def as_sec_code(document_list: List[Document]):

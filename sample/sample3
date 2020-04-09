@@ -1,0 +1,2 @@
+#!/bin/zsh
+python -m script 3 2019-06-19 2019-06-20
