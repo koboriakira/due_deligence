@@ -1,4 +1,4 @@
-CREATE TABLE `deligence` (
+CREATE TABLE `report` (
   `doc_id` varchar(20) PRIMARY KEY
   , `value_per_share` int -- 1株あたりの価値
   , `capital_ratio` int -- 自己資本比率
@@ -13,8 +13,8 @@ CREATE TABLE `deligence` (
   , `updated_at` timestamp -- 更新日時
 );
 
-ALTER TABLE deligence ADD INDEX idx_deligence_01(capital_ratio);
+ALTER TABLE report ADD INDEX idx_report_01(capital_ratio);
 
-ALTER TABLE deligence ADD INDEX idx_deligence_02(updated_at);
+ALTER TABLE report ADD INDEX idx_report_02(updated_at);
 
 commit;

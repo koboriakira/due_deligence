@@ -14,15 +14,19 @@ RUN apt-get update \
 ADD ./docker/mysql mysql
 RUN service mysql start \
   && mysql -uroot < mysql/init.ddl \
-  && mysql -uroot db < mysql/create_company.sql \
-  && mysql -uroot db < mysql/create_deligence.sql \
-  && mysql -uroot -proot -h localhost db < mysql/mysqldump_all_data
+  && mysql -uroot db < mysql/create_document.sql \
+  && mysql -uroot db < mysql/create_report.sql
+  # && mysql -uroot -proot -h localhost db < mysql/mysqldump_all_data
 
 ADD ./requirements.txt requirements.txt
 RUN pip install --upgrade pip \
   && pip install -r requirements.txt
 
 RUN rm -fr /docker_image/*
+
+# ログ保管用のディレクトリを作成
+
+RUN mkdir -p /work/logfile
 
 CMD service mysql start \
   && cd /work \

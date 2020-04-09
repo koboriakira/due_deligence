@@ -1,11 +1,14 @@
 import logging
 from edinet_xbrl.edinet_xbrl_parser import EdinetXbrlParser
+from typing import List
+import string
+import random
 
-from due_deligence.download_file import download_file
-from due_deligence.get_xbrl import get_xbrl
-from due_deligence import deligence_model
-from due_deligence.company import Company
-from due_deligence.scrape_stock_price import scrape_stock_price
+from due_deligence.util import calm_requests as requests
+
+from due_deligence.interactor import get_xbrl
+from due_deligence.domain_model.deligence import Deligence
+from due_deligence.interactor.company import Company
 from due_deligence import deligence_repository
 
 ITEMS = {
@@ -23,6 +26,7 @@ ITEMS_2 = {
     '': ['jppfs_cor:CurrentAssets', 'Prior1YearInstant']
 }
 
+DIR = 'tmp'
 
 def analyze(company: Company):
     deligence = get_deligence(company)
@@ -31,11 +35,11 @@ def analyze(company: Company):
 
     print('1株あたりの価値', deligence.value_per_share(), '(円)')
 
-    stock_price = scrape_stock_price(company)
-    if not stock_price is None:
-        print('株価', stock_price, '(円)')
-        print('安全圏', underpriced(stock_price,
-                                 deligence.value_per_share()), '(%)')
+    # stock_price = scrape_stock_price.scrape_stock_price(company)
+    # if not stock_price is None:
+    #     print('株価', stock_price, '(円)')
+    #     print('安全圏', underpriced(stock_price,
+    #                              deligence.value_per_share()), '(%)')
 
 
 def get_deligence(company: Company):
@@ -51,7 +55,7 @@ def get_deligence(company: Company):
         logging.error('エラー！ ファイルが取得または開くことができませんでした')
         return None
 
-    xbrl_path = get_xbrl(path)
+    xbrl_path = get_xbrl.get_xbrl(path)
     parser = EdinetXbrlParser()
     edinet_obj = parser.parse_file(xbrl_path)
 
@@ -61,7 +65,7 @@ def get_deligence(company: Company):
         logging.error('エラー！ XBRLの解析ができませんでした')
         return None
 
-    deligence = deligence_model.contruct_by_xbrl_dict(
+    deligence = Deligence.contruct_by_xbrl_dict(
         company.doc_id, xbrl_dict)
     deligence_repository.insert(deligence)
     return deligence
@@ -90,3 +94,26 @@ def underpriced(stock_price, value_per_share):
     安全圏、割安度を確認
     """
     return round(100 * stock_price / value_per_share, 0)
+
+def download_file(url: str) -> List[str]:
+    """
+    URL を指定してカレントディレクトリにファイルをダウンロードする
+    """
+
+    filename = randomname(10)
+    filepath = '/' + DIR + '/' + filename + '.zip'
+    r = requests.get(url)
+    with open(filepath, 'wb') as f:
+        for chunk in r.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
+                f.flush()
+        return [DIR, filename]
+
+    # ファイルが開けなかった場合は False を返す
+    return False
+
+def randomname(n):
+    randlst = [random.choice(string.ascii_letters + string.digits)
+               for i in range(n)]
+    return ''.join(randlst)

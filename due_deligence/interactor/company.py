@@ -11,7 +11,6 @@ TARGET_DOC_TYPE_CODE = '120'
 
 class Company:
     def __init__(self, doc_id, date, seq_number, edinet_code, sec_code, form_code, doc_type_code, filer_name):
-        super().__init__()
         self.doc_id = doc_id
         self.date = date
         self.seq_number = seq_number
@@ -39,6 +38,19 @@ class Company:
             'doc_type_code': self.doc_type_code,
             'filer_name': self.filer_name,
         }
+
+    @classmethod
+    def construct_from_edinet(cls, result, date):
+        doc_id = result['docID']
+        seq_number = result['seqNumber']
+        edinet_code = result['edinetCode']
+        sec_code = None
+        if type(result['secCode']) is str:
+            sec_code = result['secCode'][0:len(result['secCode']) - 1]
+        form_code = result['formCode']
+        doc_type_code = result['docTypeCode']
+        filer_name = result['filerName']
+        return Company(doc_id, date, seq_number, edinet_code, sec_code, form_code, doc_type_code, filer_name)
 
     def to_str(self):
         return '[' + str(self.date) + '] ' + str(self.sec_code) + ' ' + self.filer_name

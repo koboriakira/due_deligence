@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import logging
-from due_deligence.company import Company
+from due_deligence.interactor.company import Company
 from due_deligence import calm_requests
 
 

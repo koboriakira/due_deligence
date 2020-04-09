@@ -2,10 +2,25 @@ import sys
 import logging
 from datetime import date
 from copy import copy
+import inject
 
+from due_deligence.controller import dd_controller
 from due_deligence import get_company
-from due_deligence import analyze_financial_reports
+from due_deligence.interactor import analyze_financial_reports
 from due_deligence.config import TARGET_COMPANY_LIST, DETAIL, WAIT_TIME
+from due_deligence.adapter.document import DocumentRepository
+from due_deligence.adapter.repo.document.document_mysql_repository import DocumentMysqlRepository
+from due_deligence.interactor.analyze_requestor import AnalyzeRequestor
+from due_deligence.interactor.analyze_generator import AnalyzeGenerator
+from due_deligence.domain_model.document import DocumentService
+from due_deligence.adapter.document import SimpleDocumentService
+from due_deligence.domain_model.deligence import DeligenceService
+from due_deligence.adapter.deligence import SimpleDeligenceService
+from due_deligence.adapter.deligence import XbrlDownloader, ReportRepository
+from due_deligence.adapter.http.xbrl_obj_downloader import XbrlObjDownloader
+from due_deligence.adapter.repo.deligence.report_mysql_repository import ReportMysqlRepository
+from due_deligence.controller.dd_controller import ResultPresenter
+from due_deligence.adapter.presenter.result_screen_presenter import ResultScreenPresenter
 
 
 def pattern1():
@@ -19,8 +34,7 @@ def pattern1():
     else:
         target_date = str(date.today())
 
-    company_list = get_company.search_company_list(target_date, copy(target_date))
-    analyze_financial_reports.execute(company_list)
+    dd_controller.pattern1(target_date)
 
 
 def pattern2():
@@ -34,8 +48,7 @@ def pattern2():
     if len(sys.argv) >= 3:
         sec_code_list = sys.argv[2].split(',')
 
-    company_list = get_company.search_company_list_by_sec_code(sec_code_list)
-    analyze_financial_reports.execute(company_list)
+    dd_controller.pattern2(sec_code_list)
 
 
 def pattern3():
@@ -55,11 +68,29 @@ def pattern3():
     else:
         end_date_str = copy(from_date_str)
 
-    company_list = get_company.search_company_list(from_date_str, end_date_str)
-    analyze_financial_reports.execute(company_list)
+    dd_controller.pattern3(from_date_str, end_date_str)
+
+
+def config(binder):
+    binder.bind_to_constructor(DocumentService, SimpleDocumentService)
+    binder.bind_to_constructor(DeligenceService, SimpleDeligenceService)
+    binder.bind_to_constructor(XbrlDownloader, XbrlObjDownloader)
+    binder.bind_to_constructor(ReportRepository, ReportMysqlRepository)
+    binder.bind_to_constructor(ResultPresenter, ResultScreenPresenter)
+    mysql_connection_param = {
+        'db': 'db',
+        'user': 'admin',
+        'passwd': 'admin',
+        'charset': 'utf8mb4'
+    }
+    binder.bind_to_constructor(DocumentRepository, DocumentMysqlRepository)
+    binder.bind_to_constructor(AnalyzeRequestor, AnalyzeGenerator)
 
 
 if __name__ == '__main__':
+    inject.configure(config)
+    logging.basicConfig(filename='logfile/logger.log', level=logging.DEBUG)
+
     if len(sys.argv) < 2:
         logging.error('エラー パターンを指定してください')
 
@@ -69,6 +100,3 @@ if __name__ == '__main__':
         pattern2()
     elif sys.argv[1] == '3':
         pattern3()
-
-    # このあとYahoo株価から現時点の株価を取得したい
-    # https://stocks.finance.yahoo.co.jp/stocks/detail/?code=7751.T
