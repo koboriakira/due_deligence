@@ -1,4 +1,4 @@
-CREATE TABLE `company` (
+CREATE TABLE `document` (
   `date` date
   , `seq_number` int
   , `edinet_code` varchar(10)
@@ -11,9 +11,9 @@ CREATE TABLE `company` (
   , PRIMARY KEY(date, seq_number)
 );
 
-ALTER TABLE company ADD INDEX idx_company_01(filer_name);
+ALTER TABLE document ADD INDEX idx_document_01(filer_name);
 
-ALTER TABLE company ADD INDEX idx_company_02(sec_code, form_code, doc_type_code);
+ALTER TABLE document ADD INDEX idx_document_02(sec_code, form_code, doc_type_code);
 
 
 commit;

@@ -2,10 +2,10 @@ import sys
 import logging
 from datetime import date
 from copy import copy
+import inject
 
-from get_company import search_company_list, search_company_list_by_sec_code
-import analyze_financial_reports
-from config import TARGET_COMPANY_LIST, DETAIL, WAIT_TIME
+from due_deligence.controller import dd_controller
+from due_deligence.myconfig import myconfig, inject_config
 
 
 def pattern1():
@@ -19,8 +19,7 @@ def pattern1():
     else:
         target_date = str(date.today())
 
-    company_list = search_company_list(target_date, copy(target_date))
-    analyze_financial_reports.execute(company_list)
+    dd_controller.pattern1(target_date)
 
 
 def pattern2():
@@ -30,12 +29,11 @@ def pattern2():
     """
     logging.info('pattern2')
 
-    sec_code_list = TARGET_COMPANY_LIST
+    sec_code_list = myconfig.TARGET_COMPANY_LIST
     if len(sys.argv) >= 3:
         sec_code_list = sys.argv[2].split(',')
 
-    company_list = search_company_list_by_sec_code(sec_code_list)
-    analyze_financial_reports.execute(company_list)
+    dd_controller.pattern2(sec_code_list)
 
 
 def pattern3():
@@ -43,7 +41,6 @@ def pattern3():
     バッチ処理によって、指定期間の分析をゆっくり行います
     """
     logging.info('pattern3')
-    WAIT_TIME = 5
 
     if len(sys.argv) > 2:
         from_date_str = sys.argv[2]
@@ -55,20 +52,18 @@ def pattern3():
     else:
         end_date_str = copy(from_date_str)
 
-    company_list = search_company_list(from_date_str, end_date_str)
-    analyze_financial_reports.execute(company_list)
+    dd_controller.pattern3(from_date_str, end_date_str)
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        logging.error('エラー パターンを指定してください')
+    logging.basicConfig(filename='logfile/logger.log', level=logging.DEBUG)
+    inject_config.init_injection()
 
-    if sys.argv[1] == '1':
+    if len(sys.argv) == 1:
+        pattern1()
+    elif sys.argv[1] == '1':
         pattern1()
     elif sys.argv[1] == '2':
         pattern2()
     elif sys.argv[1] == '3':
         pattern3()
-
-    # このあとYahoo株価から現時点の株価を取得したい
-    # https://stocks.finance.yahoo.co.jp/stocks/detail/?code=7751.T
