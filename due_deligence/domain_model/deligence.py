@@ -1,6 +1,5 @@
 from abc import ABCMeta, abstractmethod
 from datetime import date
-from due_deligence.config import DETAIL
 
 
 class Deligence:
@@ -22,17 +21,13 @@ class Deligence:
         # 前期、今期の営業利益をもとに、事業価値を出す
         business_value = (self.current_year_operating_income +
                           self.prior_1year_operating_income) / 2 * 10
-        self.print_billion('事業価値', business_value)
 
         # 流動資産・流動負債、固定資産の一部から財産価値を出す
         property_value = self.current_year_current_assets - \
             (self.current_year_current_liabilities * 1.2) + \
             self.current_year_investments_and_other_assets
-        self.print_billion('財産価値', property_value)
 
         # 借金＝固定負債を引く
-        self.print_billion('会社の価値', business_value + property_value -
-                           self.current_year_noncurrent_liabilities)
         return business_value + property_value - self.current_year_noncurrent_liabilities
 
     # 一株あたりの価値を出す
@@ -44,10 +39,6 @@ class Deligence:
         sum = self.current_year_current_liabilities + \
             self.current_year_noncurrent_liabilities + self.current_year_net_assets
         return int(round(100 * (self.current_year_net_assets / sum)))
-
-    def print_billion(self, title: str, value: int):
-        if DETAIL:
-            print(title, value / 100000000, '(億円)')
 
     def to_dto(self):
         entity = {
@@ -88,9 +79,10 @@ def million(value_str: str):
     value = int(value_str)
     return round(value / 1000000, 0)
 
-class DeligenceService(object):
-  __metaclass__ = ABCMeta
 
-  @abstractmethod
-  def search(self, doc_id_list):
-    raise NotImplementedError
+class DeligenceService(object):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def search(self, doc_id_list):
+        raise NotImplementedError

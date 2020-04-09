@@ -1,5 +1,4 @@
 from abc import ABCMeta, abstractmethod
-from due_deligence.config import TARGET_COMPANY_LIST
 from typing import List
 
 TARGET_FORM_CODE_LIST = [
