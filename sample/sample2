@@ -1,2 +1,2 @@
 #!/bin/zsh
-python -m script 2 3197
+python -m due_deligence 2 3197

@@ -18,6 +18,7 @@ class SimpleDocumentService(DocumentService):
         """
         指定された期間にある企業の有価証券報告書のドキュメントリンク情報を取得
         """
+        print('- xbrlファイルの一覧を取得します。')
         target_date = copy(from_date)
 
         result = []

@@ -31,12 +31,10 @@ class DDController:
         self._pattern1(self._from_date, self._end_date, self._print_result)
 
     def _pattern1(self, from_date, end_date, print_result):
-        print('- xbrlファイルの一覧を取得します。')
         document_list = self._document_service.search(from_date, end_date)
         documents_as_sec_code = as_sec_code(document_list)
         logging.info(documents_as_sec_code)
 
-        print('- ファイルの解析を行います。%s秒かかる想定です。' % str(len(document_list)))
         doc_id_list = get_doc_id_list(document_list)
         report_map = self._deligence_service.search(doc_id_list)
         logging.info(report_map)
@@ -57,13 +55,11 @@ class DDController:
         print('- 完了しました!')
 
     def _pattern2(self, sec_code_list: List[str]):
-        print('- xbrlファイルの一覧を取得します。')
         document_list = self._document_service.search_by_sec_code(
             sec_code_list)
         documents_as_sec_code = as_sec_code(document_list)
         logging.info(documents_as_sec_code)
 
-        print('- ファイルの解析を行います。%s秒かかる想定です。' % str(len(document_list)))
         doc_id_list = get_doc_id_list(document_list)
         report_map = self._deligence_service.search(doc_id_list)
         logging.info(report_map)
@@ -111,12 +107,9 @@ def create_due_deligence_json(documents_as_sec_code, report_map, share_price_map
     result_json = {}
     for sec_code in share_price_map:
         filer_name = documents_as_sec_code[sec_code][0].filer_name()
-        print(sec_code, filer_name)
         stock_price = share_price_map[sec_code]
-        print('株価', stock_price, '(円)')
         due_deligences = []
         for document in documents_as_sec_code[sec_code]:
-            print(str(document.date()))
             if document.doc_id() not in report_map:
                 due_deligence = {
                     'isError': True
