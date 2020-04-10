@@ -20,19 +20,23 @@ RUN service mysql start \
   && mysql -uroot db < mysql/create_report.sql
   # && mysql -uroot -proot -h localhost db < mysql/mysqldump_all_data
 
-# Pythonの必要なモジュールをインストール
+WORKDIR /work
+
+ADD ./due_deligence due_deligence
 ADD ./requirements.txt requirements.txt
+ADD ./setup.py setup.py
+ADD ./MANIFEST.in MANIFEST.in
+
+# Pythonの必要なモジュールをインストール
 RUN pip install --upgrade pip \
   && pip install -r requirements.txt
 
-# ログ保管用のディレクトリを作成
-ADD logs /work/logs
+# パッケージ化したものをローカルにインストールする
+RUN python setup.py develop
 
 # sampleを追加
 ADD sample /work/sample
 
-# 使わないファイルたちを削除
-RUN rm -fr /docker_image/*
 
 CMD service mysql start \
   && cd /work \
