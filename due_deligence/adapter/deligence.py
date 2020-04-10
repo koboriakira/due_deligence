@@ -1,11 +1,14 @@
 from abc import ABCMeta, abstractmethod
 import inject
-import logging
+from logging import getLogger
 import traceback
 from typing import List
 from tqdm import tqdm
 
 from due_deligence.domain_model.deligence import Deligence, DeligenceService
+from due_deligence.util.progress_presenter import ProgressPresenter
+
+logger = getLogger(__name__)
 
 ITEMS = {
     '当期営業利益': [['jppfs_cor:OperatingIncome', 'CurrentYearDuration'], ['jppfs_cor:OperatingIncome', 'CurrentYearDuration_NonConsolidatedMember']],
@@ -21,13 +24,13 @@ ITEMS = {
 
 class SimpleDeligenceService(DeligenceService):
     def __init__(self):
-        self._repo = inject.instance(ReportRepository)
         self._downloader = inject.instance(XbrlDownloader)
+        self._progress_presenter = inject.instance(ProgressPresenter)
 
     def search(self, doc_id_list: List[str]):
-        print('- ファイルの解析を行います')
+        self._progress_presenter.print('- ファイルの解析を行います')
         deligence_map = {}
-        for i in tqdm(range(len(doc_id_list))):
+        for i in self._progress_presenter.wrap_tqdm(range(len(doc_id_list))):
             doc_id = doc_id_list[i]
             deligence = self._get_deligence(doc_id)
             if deligence is not None:
@@ -35,22 +38,15 @@ class SimpleDeligenceService(DeligenceService):
         return deligence_map
 
     def _get_deligence(self, doc_id: str):
-        # あとでリポジトリ.findを入れる
-        deligence = self._repo.find(doc_id)
-        if deligence is not None:
-            return deligence
-
         edinet_obj = self._downloader.get(doc_id)
 
         # XBRLの解析
         xbrl_dict = edinet_obj.get_value_dict()
         if not xbrl_dict:
-            logging.error('エラー！ XBRLの解析ができませんでした doc_id:%s' % doc_id)
+            logger.error('エラー！ XBRLの解析ができませんでした doc_id:%s' % doc_id)
             return None
 
         deligence = Deligence.contruct_by_xbrl_dict(doc_id, xbrl_dict)
-        self._repo.insert(deligence)
-        # deligence_repository.insert(deligence)
         return deligence
 
 
@@ -65,12 +61,12 @@ class EdinetObjWrapper:
                 key_and_ref_list = ITEMS[item_name]
                 item_value = self._get_item_value(key_and_ref_list)
                 if item_value is None:
-                    logging.error('取得できない項目がありました: %s' % item_name)
+                    logger.error('取得できない項目がありました: %s' % item_name)
                     return False
                 value_dict[item_name] = item_value
             return value_dict
         except AttributeError as e:
-            traceback.print_exc()
+            logger.exception('例外が発生しました。 %s', e)
             return False
 
     def _get_item_value(self, key_and_ref_list):
@@ -91,23 +87,5 @@ class XbrlDownloader(object):
         """
         指定されたdocIDをもとにxbrlファイルをダウンロードして、
         その中身をXbrlEdinetParserでparseしたものを返却する
-        """
-        raise NotImplementedError
-
-
-class ReportRepository(object):
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def find(self, doc_id):
-        """
-        指定されたdoc_idに一致するdeligenceテーブルのレコードを返す
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def insert(self, deligence: Deligence):
-        """
-        指定されたDeligenceを記録する
         """
         raise NotImplementedError
