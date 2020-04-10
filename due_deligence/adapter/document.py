@@ -8,20 +8,24 @@ from tqdm import tqdm
 
 from due_deligence.domain_model.document import Document, DocumentService
 from due_deligence.util import calm_requests as requests
+from due_deligence.util.progress_presenter import ProgressPresenter
 
 
 class SimpleDocumentService(DocumentService):
+
+    def __init__(self):
+        self._progress_presenter = inject.instance(ProgressPresenter)
 
     def search(self, from_date: date, end_date: date) -> List[Document]:
         """
         指定された期間にある企業の有価証券報告書のドキュメントリンク情報を取得
         """
-        print('- xbrlファイルの一覧を取得します。')
+        self._progress_presenter.print('- xbrlファイルの一覧を取得します。')
         target_date = copy(from_date)
 
         result = []
         dt = from_date - end_date
-        for i in tqdm(range(dt.days + 1)):
+        for i in self._progress_presenter.wrap_tqdm(range(dt.days + 1)):
             # while from_date <= target_date and target_date <= end_date:
             document_list = self._search_document(target_date)
             result.extend(document_list)

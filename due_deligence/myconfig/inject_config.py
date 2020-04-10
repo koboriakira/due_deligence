@@ -10,17 +10,22 @@ from due_deligence.controller.dd_controller import ResultPresenter
 from due_deligence.adapter.presenter.result_screen_presenter import ResultScreenPresenter
 from due_deligence.adapter.presenter.result_json_presenter import ResultJsonPresenter
 from due_deligence.adapter.presenter.result_today_recommend_presenter import ResultTodayRecommendPresenter
+from due_deligence.util.progress_presenter import ProgressPresenter
+from due_deligence.adapter.presenter.cli_progress_presenter import CliProgressPresenter
+from due_deligence.adapter.presenter.null_progress_presenter import NullProgressPresenter
 
 __DEFAULT_OUTPUT_FILEPATH = './due_deligence'
 
 __output_path = ''
 __format = ''
+__is_cli = False
 
 
-def init_injection(output_path, format_type):
-    global __output_path, __format
+def init_injection(output_path='', format_type='', is_cli=False):
+    global __output_path, __format, __is_cli
     __output_path = output_path
     __format = format_type
+    __is_cli = is_cli
     inject.configure(config)
 
 
@@ -34,5 +39,8 @@ def config(binder):
         path = __output_path if len(
             __output_path) > 0 else __DEFAULT_OUTPUT_FILEPATH + '.json'
         binder.bind(ResultPresenter, ResultJsonPresenter(path))
-
-        # 指定されたパスへのcsvやjson出力にも対応させる。
+    # 指定されたパスへのcsvやjson出力にも対応させる。
+    if __is_cli:
+        binder.bind_to_constructor(ProgressPresenter, CliProgressPresenter)
+    else:
+        binder.bind_to_constructor(ProgressPresenter, NullProgressPresenter)

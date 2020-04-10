@@ -33,7 +33,7 @@ def main():
 
     # 依存制御の設定
     inject_config.init_injection(
-        output_path=args.output, format_type=args.format)
+        output_path=args.output, format_type=args.format, is_cli=True)
 
     # 処理の実行
     target_date_str = args.date if len(args.date) > 0 else str(date.today())
@@ -41,7 +41,10 @@ def main():
     try:
         target_date = date.fromisoformat(target_date_str)
         controller = dd_controller.DDController(target_date)
-        controller.execute()
+        result = controller.execute()
+
+        presenter = inject.instance(dd_controller.ResultPresenter)
+        presenter.print(result)
     except ValueError as ve:
         logger = logging.getLogger(__name__)
         logger.exception('例外を検出しました。 %s', ve)

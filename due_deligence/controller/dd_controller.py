@@ -23,9 +23,8 @@ class DDController:
 
         self._document_service = inject.instance(DocumentService)
         self._deligence_service = inject.instance(DeligenceService)
-        self._presenter = inject.instance(ResultPresenter)
 
-    def execute(self):
+    def execute(self) -> Dict:
         # if len(self._sec_code_list) > 0:
         #     self._pattern2(self._sec_code_list)
         #     return
@@ -44,11 +43,8 @@ class DDController:
         share_price_map = share_price_search(
             list(documents_as_sec_code.keys()))
 
-        result_json = create_due_deligence_json(
+        return create_due_deligence_dict(
             documents_as_sec_code, report_map, share_price_map)
-        self._presenter.print(result_json)
-
-        print('- 完了しました!')
 
     # def _pattern2(self, sec_code_list: List[str]):
     #     document_list = self._document_service.search_by_sec_code(
@@ -96,7 +92,7 @@ def get_doc_id_list(document_list: List[Document]):
     return doc_id_list
 
 
-def create_due_deligence_json(documents_as_sec_code, report_map, share_price_map):
+def create_due_deligence_dict(documents_as_sec_code, report_map, share_price_map) -> Dict:
     """
     株価の取得できた企業についてレポート結果をjson形式で返却
     """
@@ -134,7 +130,7 @@ class ResultPresenter(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def print(self, result: Dict):
+    def print(self, result: Dict) -> None:
         """
         分析結果を出力する
         """

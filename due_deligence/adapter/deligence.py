@@ -6,6 +6,7 @@ from typing import List
 from tqdm import tqdm
 
 from due_deligence.domain_model.deligence import Deligence, DeligenceService
+from due_deligence.util.progress_presenter import ProgressPresenter
 
 logger = getLogger(__name__)
 
@@ -24,11 +25,12 @@ ITEMS = {
 class SimpleDeligenceService(DeligenceService):
     def __init__(self):
         self._downloader = inject.instance(XbrlDownloader)
+        self._progress_presenter = inject.instance(ProgressPresenter)
 
     def search(self, doc_id_list: List[str]):
-        print('- ファイルの解析を行います')
+        self._progress_presenter.print('- ファイルの解析を行います')
         deligence_map = {}
-        for i in tqdm(range(len(doc_id_list))):
+        for i in self._progress_presenter.wrap_tqdm(range(len(doc_id_list))):
             doc_id = doc_id_list[i]
             deligence = self._get_deligence(doc_id)
             if deligence is not None:
