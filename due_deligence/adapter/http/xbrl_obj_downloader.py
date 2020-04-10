@@ -7,46 +7,47 @@ from typing import List
 from edinet_xbrl.edinet_xbrl_parser import EdinetXbrlParser
 
 from due_deligence.util import calm_requests as requests
-from due_deligence.adapter.deligence import XbrlDownloader
+from due_deligence.adapter.deligence import XbrlDownloader, EdinetObjWrapper
 
 DIR = 'tmp'
 
+
 class XbrlObjDownloader(object):
-  def get(self, doc_id: str):
-    detail_url = self._generate_doc_url(doc_id)
+    def get(self, doc_id: str) -> EdinetObjWrapper:
+        detail_url = self._generate_doc_url(doc_id)
 
-    # XBRLの取得
-    path = self._download_file(detail_url)
-    print(path)
-    if not path:
-        logging.error('エラー！ ファイルが取得または開くことができませんでした')
-        return None
+        # XBRLの取得
+        path = self._download_file(detail_url)
+        if not path:
+            logging.error('エラー！ ファイルが取得または開くことができませんでした')
+            return None
 
-    xbrl_path = get_xbrl(path)
-    parser = EdinetXbrlParser()
-    return parser.parse_file(xbrl_path)
+        xbrl_path = get_xbrl(path)
+        parser = EdinetXbrlParser()
+        return EdinetObjWrapper(parser.parse_file(xbrl_path))
 
-  def _generate_doc_url(self, doc_id:str):
-    # ex.) https://disclosure.edinet-fsa.go.jp/api/v1/documents/S100IA9D?type=1
-    return 'https://disclosure.edinet-fsa.go.jp/api/v1/documents/' + doc_id + '?type=1'
+    def _generate_doc_url(self, doc_id: str):
+        # ex.) https://disclosure.edinet-fsa.go.jp/api/v1/documents/S100IA9D?type=1
+        return 'https://disclosure.edinet-fsa.go.jp/api/v1/documents/' + doc_id + '?type=1'
 
-  def _download_file(self, url: str) -> List[str]:
-      """
-      URL を指定してカレントディレクトリにファイルをダウンロードする
-      """
+    def _download_file(self, url: str) -> List[str]:
+        """
+        URL を指定してカレントディレクトリにファイルをダウンロードする
+        """
 
-      filename = randomname(10)
-      filepath = '/' + DIR + '/' + filename + '.zip'
-      r = requests.get(url)
-      with open(filepath, 'wb') as f:
-          for chunk in r.iter_content(chunk_size=1024):
-              if chunk:
-                  f.write(chunk)
-                  f.flush()
-          return [DIR, filename]
+        filename = randomname(10)
+        filepath = '/' + DIR + '/' + filename + '.zip'
+        r = requests.get(url)
+        with open(filepath, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+                    f.flush()
+            return [DIR, filename]
 
-      # ファイルが開けなかった場合は False を返す
-      return False
+        # ファイルが開けなかった場合は False を返す
+        return False
+
 
 def get_xbrl(path: List[str]) -> str:
     zip_extract(path)
@@ -65,5 +66,5 @@ def zip_extract(path: List[str]):
 
 def randomname(n):
     randlst = [random.choice(string.ascii_letters + string.digits)
-            for i in range(n)]
+               for i in range(n)]
     return ''.join(randlst)

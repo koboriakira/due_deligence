@@ -1,2 +1,2 @@
 #!/bin/zsh
-python -m script 3 2019-06-19 2019-06-20
+python -m due_deligence 3 2019-06-19 2019-06-20

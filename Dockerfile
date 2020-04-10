@@ -37,4 +37,5 @@ RUN rm -fr /docker_image/*
 
 CMD service mysql start \
   && cd /work \
+  && pip install -e . \
   && /bin/bash
