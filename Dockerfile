@@ -25,7 +25,6 @@ ADD ./requirements.txt requirements.txt
 RUN pip install --upgrade pip \
   && pip install -r requirements.txt
 
-
 # ログ保管用のディレクトリを作成
 ADD logs /work/logs
 
