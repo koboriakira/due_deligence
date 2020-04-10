@@ -5,6 +5,8 @@ from due_deligence.domain_model.document import DocumentService
 from due_deligence.adapter.document import SimpleDocumentService
 from due_deligence.domain_model.deligence import DeligenceService
 from due_deligence.adapter.deligence import SimpleDeligenceService, XbrlDownloader
+from due_deligence.domain_model.stock import StockService
+from due_deligence.adapter.stock import SimpleStockService
 from due_deligence.adapter.http.xbrl_obj_downloader import XbrlObjDownloader
 from due_deligence.controller.dd_controller import ResultPresenter
 from due_deligence.adapter.presenter.result_screen_presenter import ResultScreenPresenter
@@ -32,6 +34,7 @@ def init_injection(output_path='', format_type='', is_cli=False):
 def config(binder):
     binder.bind_to_constructor(DocumentService, SimpleDocumentService)
     binder.bind_to_constructor(DeligenceService, SimpleDeligenceService)
+    binder.bind_to_constructor(StockService, SimpleStockService)
     binder.bind_to_constructor(XbrlDownloader, XbrlObjDownloader)
     if __format == 'screen':
         binder.bind_to_constructor(ResultPresenter, ResultScreenPresenter)

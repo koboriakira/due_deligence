@@ -1,5 +1,6 @@
 from due_deligence.domain_model.deligence import Deligence, DeligenceService
 from due_deligence.domain_model.document import Document, DocumentService
+from due_deligence.domain_model.stock import StockService
 import sys
 from logging import getLogger
 from datetime import date
@@ -23,6 +24,7 @@ class DDController:
 
         self._document_service = inject.instance(DocumentService)
         self._deligence_service = inject.instance(DeligenceService)
+        self._stock_service = inject.instance(StockService)
 
     def execute(self) -> Dict:
         # if len(self._sec_code_list) > 0:
@@ -39,12 +41,11 @@ class DDController:
         logger.debug(report_map)
 
         # todo: service化する？
-        print('- 現在の株価を取得していきます')
-        share_price_map = share_price_search(
+        stock_map = self._stock_service.search(
             list(documents_as_sec_code.keys()))
 
         return create_due_deligence_dict(
-            documents_as_sec_code, report_map, share_price_map)
+            documents_as_sec_code, report_map, stock_map)
 
     # def _pattern2(self, sec_code_list: List[str]):
     #     document_list = self._document_service.search_by_sec_code(
@@ -92,14 +93,14 @@ def get_doc_id_list(document_list: List[Document]):
     return doc_id_list
 
 
-def create_due_deligence_dict(documents_as_sec_code, report_map, share_price_map) -> Dict:
+def create_due_deligence_dict(documents_as_sec_code: Dict, report_map: Dict, stock_map: Dict) -> Dict:
     """
     株価の取得できた企業についてレポート結果をjson形式で返却
     """
     result_json = {}
-    for sec_code in share_price_map:
+    for sec_code in stock_map:
         filer_name = documents_as_sec_code[sec_code][0].filer_name()
-        stock_price = share_price_map[sec_code]
+        stock = stock_map[sec_code]
         due_deligences = []
         for document in documents_as_sec_code[sec_code]:
             if document.doc_id() not in report_map:
@@ -109,7 +110,8 @@ def create_due_deligence_dict(documents_as_sec_code, report_map, share_price_map
                 due_deligences.append(due_deligence)
                 continue
             report = report_map[document.doc_id()]
-            underpriced = _underpriced(stock_price, report.value_per_share())
+            underpriced = _underpriced(
+                stock.share_price(), report.value_per_share())
             due_deligence = {
                 'isError': False,
                 'date': str(document.date()),
@@ -120,7 +122,7 @@ def create_due_deligence_dict(documents_as_sec_code, report_map, share_price_map
             due_deligences.append(due_deligence)
         result_json[sec_code] = {
             'filerName': documents_as_sec_code[sec_code][0].filer_name(),
-            'stockPrice': stock_price,
+            'stockPrice': stock.share_price(),
             'due_deligences': due_deligences
         }
     return result_json
