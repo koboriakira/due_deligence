@@ -27,21 +27,25 @@ def main():
 
     # ログ設定
     if args.debug:
-        logging.basicConfig(filename='debug.log', level=logging.DEBUG)
+        logging.basicConfig(level=logging.DEBUG)
     else:
-        logging.basicConfig(handlers=logging.NullHandler)
+        logging.basicConfig(handlers=[logging.NullHandler()])
 
     # 依存制御の設定
     inject_config.init_injection(
         output_path=args.output, format_type=args.format)
 
     # 処理の実行
-    target_date = args.date if len(args.date) > 0 else str(date.today())
+    target_date_str = args.date if len(args.date) > 0 else str(date.today())
 
     try:
-        controller = dd_controller.DDController(
-            from_date_str=target_date, print_result=True)
+        target_date = date.fromisoformat(target_date_str)
+        controller = dd_controller.DDController(target_date)
         controller.execute()
+    except ValueError as ve:
+        logger = logging.getLogger(__name__)
+        logger.exception('例外を検出しました。 %s', ve)
+        print('引数の指定が誤っています。')
     except Exception as e:
         logger = logging.getLogger(__name__)
         logger.exception('例外を検出しました。 %s', e)

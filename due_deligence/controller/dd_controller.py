@@ -6,20 +6,19 @@ from datetime import date
 from copy import copy
 import inject
 from abc import ABCMeta, abstractmethod
-from typing import Dict, List
+from typing import Dict, List, Optional
 from tqdm import tqdm
 
 logger = getLogger(__name__)
 
 
 class DDController:
-    def __init__(self, from_date_str=None, end_date_str=None, sec_code_list=[], print_result=True):
-        self._from_date = date.today()
-        if from_date_str is not None:
-            self._from_date = date.fromisoformat(from_date_str)
-        self._end_date = copy(self._from_date)
-        if end_date_str is not None:
-            self._end_date = date.fromisoformat(end_date_str)
+    def __init__(self, from_date: date, end_date: Optional[date] = None, sec_code_list: List[str] = [], print_result: bool = True):
+        self._from_date = from_date
+        if end_date is None:
+            self._end_date = copy(from_date)
+        else:
+            self._end_date = end_date
         self._sec_code_list = sec_code_list
         self._print_result = print_result
 
