@@ -27,7 +27,7 @@ RUN pip install --upgrade pip \
 
 
 # ログ保管用のディレクトリを作成
-RUN mkdir -p /work/logfile
+ADD logs /work/logs
 
 # sampleを追加
 ADD sample /work/sample
@@ -37,5 +37,4 @@ RUN rm -fr /docker_image/*
 
 CMD service mysql start \
   && cd /work \
-  && pip install -e . \
   && /bin/bash

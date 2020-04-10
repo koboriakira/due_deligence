@@ -49,7 +49,9 @@ def pattern3():
     controller.execute()
 
 
-logging.basicConfig(filename='logfile/logger.log', level=logging.ERROR)
+filename = 'logger.log'
+filepath = 'logs/' + filename
+logging.basicConfig(filename=filepath, level=logging.ERROR)
 
 
 if len(sys.argv) == 1:
