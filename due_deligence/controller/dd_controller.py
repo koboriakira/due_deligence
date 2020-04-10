@@ -51,7 +51,7 @@ class DDController:
             presenter = inject.instance(ResultPresenter)
 
             file_name = str(from_date) + '_' + str(end_date)
-            presenter.print(result_json, file_name=file_name)
+            presenter.print(result_json)
 
         print('- 完了しました!')
 
@@ -74,7 +74,7 @@ class DDController:
         result_json = create_due_deligence_json(
             documents_as_sec_code, report_map, share_price_map)
         presenter = inject.instance(ResultPresenter)
-        presenter.print(result_json, file_name='selected')
+        presenter.print(result_json)
 
 
 def as_sec_code(document_list: List[Document]):
@@ -147,6 +147,7 @@ class ResultPresenter(object):
         """
         分析結果を出力する
         """
+        raise NotImplementedError
 
 # 以下はリファクタして消す予定。
 

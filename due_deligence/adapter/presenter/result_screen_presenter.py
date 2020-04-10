@@ -4,8 +4,5 @@ import json
 
 
 class ResultScreenPresenter(object):
-    def print(self, result: Dict, file_name='output'):
+    def print(self, result: Dict):
         print(result)
-        f = open(file_name + '.json', "w")
-        json.dump(result, f, ensure_ascii=False, indent=4,
-                  sort_keys=True, separators=(',', ': '))

@@ -3,24 +3,40 @@ import logging
 from datetime import date
 from copy import copy
 import inject
+import argparse
 
+from datetime import date
 from due_deligence.controller import dd_controller
 from due_deligence.myconfig import myconfig, inject_config
 
-# pip install でduedeliコマンドが使えるようになったとき、
-# duedeliコマンド
+# CUIで `duedeli` を実行したときの最初の入口がこれ
 
 
 def main():
-    logging.basicConfig(level=logging.ERROR)
-    logging.info('pattern1')
-    """
-    指定した日付に有価証券報告書を提出した企業について分析します。
-    日付が指定されていない場合は実行当日とみなします。
-    """
-    inject_config.init_injection(today_recommend=True)
-    target_date = sys.argv[2] if len(sys.argv) > 2 else None
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--date', help='YYYY-MM-DD形式で指定。指定された日付に共有された有価証券報告書を解析します。', type=str, default='')
+    parser.add_argument(
+        '--code', help='企業コードを指定。指定された企業の有価証券報告書を解析します。カンマ区切りで複数指定できます', type=str)
+    parser.add_argument(
+        '--output', help='結果の出力先を指定します。\nCSV出力またはjson出力の場合に有効になります。', type=str, default='')
+    parser.add_argument(
+        '--format', help='結果の出力形式を指定します。CSV出力、json出力から選択できます。\n指定しない場合は標準出力されます。', choices=['csv', 'json'], default='screen')
+    parser.add_argument('--debug', help='開発者モード', type=bool, default=False)
+    args = parser.parse_args()
 
+    # ログ設定
+    if args.debug:
+        logging.basicConfig(filename='debug.log', level=logging.DEBUG)
+    else:
+        logging.basicConfig(handlers=logging.NullHandler)
+
+    # 依存制御の設定
+    inject_config.init_injection(
+        output_path=args.output, format_type=args.format)
+
+    # 処理の実行
+    target_date = args.date if len(args.date) > 0 else str(date.today())
     controller = dd_controller.DDController(
         from_date_str=target_date, print_result=True)
     controller.execute()
