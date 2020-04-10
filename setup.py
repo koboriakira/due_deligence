@@ -10,7 +10,7 @@ def get_requirements():
 
 setup(
     name="due_deligence",
-    version='1.0',
+    version='1.2',
     description='EDINETから有価証券報告書を取得して企業の割安度を判定します。',
     author='Kobori Akira',
     # maintainer='',
