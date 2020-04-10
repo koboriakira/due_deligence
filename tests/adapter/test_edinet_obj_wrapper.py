@@ -4,8 +4,10 @@ import sys
 
 
 def test_edinet_obj_wrapper():
+    # https://disclosure.edinet-fsa.go.jp/api/v1/documents/S100IA9D?type=1
     assert get_value_dict('S100IC6Q')
     assert get_value_dict('S100FRGF')
+    assert get_value_dict('S100ICAI')
 
 
 def get_value_dict(filename: str):

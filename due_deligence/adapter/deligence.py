@@ -45,7 +45,7 @@ class SimpleDeligenceService(DeligenceService):
         # XBRLの解析
         xbrl_dict = edinet_obj.get_value_dict()
         if not xbrl_dict:
-            logging.error('エラー！ XBRLの解析ができませんでした')
+            logging.error('エラー！ XBRLの解析ができませんでした doc_id:%s' % doc_id)
             return None
 
         deligence = Deligence.contruct_by_xbrl_dict(doc_id, xbrl_dict)
@@ -64,7 +64,8 @@ class EdinetObjWrapper:
             for item_name in ITEMS:
                 key_and_ref_list = ITEMS[item_name]
                 item_value = self._get_item_value(key_and_ref_list)
-                if not item_value:
+                if item_value is None:
+                    logging.error('取得できない項目がありました: %s' % item_name)
                     return False
                 value_dict[item_name] = item_value
             return value_dict
@@ -77,9 +78,10 @@ class EdinetObjWrapper:
             key = key_and_ref[0]
             context_ref = key_and_ref[1]
             data = self._edinet_obj.get_data_by_context_ref(key, context_ref)
+            print(key, context_ref, type(data))
             if data is not None:
-                return data.get_value()
-        return False
+                return data.get_value() if data.get_value() is not None else 0
+        return None
 
 
 class XbrlDownloader(object):
