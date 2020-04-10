@@ -78,7 +78,6 @@ class EdinetObjWrapper:
             key = key_and_ref[0]
             context_ref = key_and_ref[1]
             data = self._edinet_obj.get_data_by_context_ref(key, context_ref)
-            print(key, context_ref, type(data))
             if data is not None:
                 return data.get_value() if data.get_value() is not None else 0
         return None
