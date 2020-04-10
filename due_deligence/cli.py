@@ -37,6 +37,12 @@ def main():
 
     # 処理の実行
     target_date = args.date if len(args.date) > 0 else str(date.today())
-    controller = dd_controller.DDController(
-        from_date_str=target_date, print_result=True)
-    controller.execute()
+
+    try:
+        controller = dd_controller.DDController(
+            from_date_str=target_date, print_result=True)
+        controller.execute()
+    except Exception as e:
+        logger = logging.getLogger(__name__)
+        logger.exception('例外を検出しました。 %s', e)
+        print('処理に失敗しました。')

@@ -1,11 +1,13 @@
 from abc import ABCMeta, abstractmethod
 import inject
-import logging
+from logging import getLogger
 import traceback
 from typing import List
 from tqdm import tqdm
 
 from due_deligence.domain_model.deligence import Deligence, DeligenceService
+
+logger = getLogger(__name__)
 
 ITEMS = {
     '当期営業利益': [['jppfs_cor:OperatingIncome', 'CurrentYearDuration'], ['jppfs_cor:OperatingIncome', 'CurrentYearDuration_NonConsolidatedMember']],
@@ -45,7 +47,7 @@ class SimpleDeligenceService(DeligenceService):
         # XBRLの解析
         xbrl_dict = edinet_obj.get_value_dict()
         if not xbrl_dict:
-            logging.error('エラー！ XBRLの解析ができませんでした doc_id:%s' % doc_id)
+            logger.error('エラー！ XBRLの解析ができませんでした doc_id:%s' % doc_id)
             return None
 
         deligence = Deligence.contruct_by_xbrl_dict(doc_id, xbrl_dict)
@@ -65,12 +67,12 @@ class EdinetObjWrapper:
                 key_and_ref_list = ITEMS[item_name]
                 item_value = self._get_item_value(key_and_ref_list)
                 if item_value is None:
-                    logging.error('取得できない項目がありました: %s' % item_name)
+                    logger.error('取得できない項目がありました: %s' % item_name)
                     return False
                 value_dict[item_name] = item_value
             return value_dict
         except AttributeError as e:
-            traceback.print_exc()
+            logger.exception('例外が発生しました。 %s', e)
             return False
 
     def _get_item_value(self, key_and_ref_list):

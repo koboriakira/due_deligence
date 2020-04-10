@@ -1,13 +1,15 @@
 from due_deligence.domain_model.deligence import Deligence, DeligenceService
 from due_deligence.domain_model.document import Document, DocumentService
 import sys
-import logging
+from logging import getLogger
 from datetime import date
 from copy import copy
 import inject
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List
 from tqdm import tqdm
+
+logger = getLogger(__name__)
 
 
 class DDController:
@@ -34,11 +36,11 @@ class DDController:
     def _pattern1(self, from_date, end_date, print_result):
         document_list = self._document_service.search(from_date, end_date)
         documents_as_sec_code = as_sec_code(document_list)
-        logging.info(documents_as_sec_code)
+        logger.info(documents_as_sec_code)
 
         doc_id_list = get_doc_id_list(document_list)
         report_map = self._deligence_service.search(doc_id_list)
-        logging.info(report_map)
+        logger.info(report_map)
 
         if print_result:
             # todo: service化する？
@@ -59,11 +61,11 @@ class DDController:
         document_list = self._document_service.search_by_sec_code(
             sec_code_list)
         documents_as_sec_code = as_sec_code(document_list)
-        logging.info(documents_as_sec_code)
+        logger.info(documents_as_sec_code)
 
         doc_id_list = get_doc_id_list(document_list)
         report_map = self._deligence_service.search(doc_id_list)
-        logging.info(report_map)
+        logger.info(report_map)
 
         # todo: service化する？
         print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
@@ -174,13 +176,13 @@ def scrape_stock_price(sec_code: str):
         value = scrape_value(sec_code)
         return to_int(value)
     except IndexError:
-        logging.warning('現在の株価が取得できませんでした')
+        logger.warning('現在の株価が取得できませんでした')
         return None
     except ValueError:
-        logging.warning('現在の株価が存在しませんでした')
+        logger.warning('現在の株価が存在しませんでした')
         return None
     except:
-        logging.error('その他エラー')
+        logger.error('その他エラー')
         return None
 
 
