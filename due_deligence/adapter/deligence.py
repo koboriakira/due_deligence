@@ -3,6 +3,7 @@ import inject
 import logging
 import traceback
 from typing import List
+from tqdm import tqdm
 
 from due_deligence.domain_model.deligence import Deligence, DeligenceService
 
@@ -24,9 +25,10 @@ class SimpleDeligenceService(DeligenceService):
         self._downloader = inject.instance(XbrlDownloader)
 
     def search(self, doc_id_list: List[str]):
-        print('- ファイルの解析を行います。%s秒かかる想定です。' % str(len(doc_id_list)))
+        print('- ファイルの解析を行います')
         deligence_map = {}
-        for doc_id in doc_id_list:
+        for i in tqdm(range(len(doc_id_list))):
+            doc_id = doc_id_list[i]
             deligence = self._get_deligence(doc_id)
             if deligence is not None:
                 deligence_map[deligence.doc_id] = deligence

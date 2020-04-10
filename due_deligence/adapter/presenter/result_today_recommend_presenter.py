@@ -6,7 +6,7 @@ UNDERPRICED_CONDITION = 50
 
 class ResultTodayRecommendPresenter(object):
     def print(self, result: Dict, file_name='output'):
-        print('安全圏50%以下の企業を一覧します')
+        print('- 結果を出力します。安全圏50%以下の企業を一覧します')
         for sec_code in result:
             for due_deligence in result[sec_code]['due_deligences']:
                 if 'underpriced' in due_deligence and due_deligence['underpriced'] > 0 and due_deligence['underpriced'] < 50:

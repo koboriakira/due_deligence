@@ -4,6 +4,7 @@ from copy import copy
 import json
 import inject
 from typing import List
+from tqdm import tqdm
 
 from due_deligence.domain_model.document import Document, DocumentService
 from due_deligence.util import calm_requests as requests
@@ -22,7 +23,9 @@ class SimpleDocumentService(DocumentService):
         target_date = copy(from_date)
 
         result = []
-        while from_date <= target_date and target_date <= end_date:
+        dt = from_date - end_date
+        for i in tqdm(range(dt.days + 1)):
+            # while from_date <= target_date and target_date <= end_date:
             document_list = self._search_document(target_date)
             result.extend(document_list)
             target_date = target_date + timedelta(days=1)

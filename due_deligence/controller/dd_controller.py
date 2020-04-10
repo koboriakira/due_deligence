@@ -7,6 +7,7 @@ from copy import copy
 import inject
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List
+from tqdm import tqdm
 
 
 class DDController:
@@ -41,9 +42,9 @@ class DDController:
 
         if print_result:
             # todo: service化する？
-            print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
-                  str(len(documents_as_sec_code.keys())))
-            share_price_map = share_price_search(documents_as_sec_code.keys())
+            print('- 現在の株価を取得していきます')
+            share_price_map = share_price_search(
+                list(documents_as_sec_code.keys()))
 
             result_json = create_due_deligence_json(
                 documents_as_sec_code, report_map, share_price_map)
@@ -67,7 +68,8 @@ class DDController:
         # todo: service化する？
         print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
               str(len(documents_as_sec_code.keys())))
-        share_price_map = share_price_search(documents_as_sec_code.keys())
+        share_price_map = share_price_search(
+            list(documents_as_sec_code.keys()))
 
         result_json = create_due_deligence_json(
             documents_as_sec_code, report_map, share_price_map)
@@ -156,9 +158,10 @@ def _underpriced(stock_price, value_per_share):
     return round(100 * stock_price / value_per_share, 0)
 
 
-def share_price_search(sec_code_list):
+def share_price_search(sec_code_list: List[str]):
     share_price_map = {}
-    for sec_code in sec_code_list:
+    for i in tqdm(range(len(sec_code_list))):
+        sec_code = sec_code_list[i]
         share_price = scrape_stock_price(sec_code)
         if share_price is not None:
             share_price_map[sec_code] = share_price
