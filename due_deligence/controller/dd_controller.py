@@ -13,69 +13,62 @@ logger = getLogger(__name__)
 
 
 class DDController:
-    def __init__(self, from_date: date, end_date: Optional[date] = None, sec_code_list: List[str] = [], print_result: bool = True):
+    def __init__(self, from_date: date, end_date: Optional[date] = None, sec_code_list: List[str] = []):
         self._from_date = from_date
         if end_date is None:
             self._end_date = copy(from_date)
         else:
             self._end_date = end_date
         self._sec_code_list = sec_code_list
-        self._print_result = print_result
 
         self._document_service = inject.instance(DocumentService)
         self._deligence_service = inject.instance(DeligenceService)
+        self._presenter = inject.instance(ResultPresenter)
 
     def execute(self):
-        if len(self._sec_code_list) > 0:
-            self._pattern2(self._sec_code_list)
-            return
+        # if len(self._sec_code_list) > 0:
+        #     self._pattern2(self._sec_code_list)
+        #     return
 
-        self._pattern1(self._from_date, self._end_date, self._print_result)
-
-    def _pattern1(self, from_date, end_date, print_result):
-        document_list = self._document_service.search(from_date, end_date)
+        document_list = self._document_service.search(
+            self._from_date, self._end_date)
         documents_as_sec_code = as_sec_code(document_list)
-        logger.info(documents_as_sec_code)
+        logger.debug(documents_as_sec_code)
 
         doc_id_list = get_doc_id_list(document_list)
         report_map = self._deligence_service.search(doc_id_list)
-        logger.info(report_map)
-
-        if print_result:
-            # todo: service化する？
-            print('- 現在の株価を取得していきます')
-            share_price_map = share_price_search(
-                list(documents_as_sec_code.keys()))
-
-            result_json = create_due_deligence_json(
-                documents_as_sec_code, report_map, share_price_map)
-            presenter = inject.instance(ResultPresenter)
-
-            file_name = str(from_date) + '_' + str(end_date)
-            presenter.print(result_json)
-
-        print('- 完了しました!')
-
-    def _pattern2(self, sec_code_list: List[str]):
-        document_list = self._document_service.search_by_sec_code(
-            sec_code_list)
-        documents_as_sec_code = as_sec_code(document_list)
-        logger.info(documents_as_sec_code)
-
-        doc_id_list = get_doc_id_list(document_list)
-        report_map = self._deligence_service.search(doc_id_list)
-        logger.info(report_map)
+        logger.debug(report_map)
 
         # todo: service化する？
-        print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
-              str(len(documents_as_sec_code.keys())))
+        print('- 現在の株価を取得していきます')
         share_price_map = share_price_search(
             list(documents_as_sec_code.keys()))
 
         result_json = create_due_deligence_json(
             documents_as_sec_code, report_map, share_price_map)
-        presenter = inject.instance(ResultPresenter)
-        presenter.print(result_json)
+        self._presenter.print(result_json)
+
+        print('- 完了しました!')
+
+    # def _pattern2(self, sec_code_list: List[str]):
+    #     document_list = self._document_service.search_by_sec_code(
+    #         sec_code_list)
+    #     documents_as_sec_code = as_sec_code(document_list)
+    #     logger.info(documents_as_sec_code)
+
+    #     doc_id_list = get_doc_id_list(document_list)
+    #     report_map = self._deligence_service.search(doc_id_list)
+    #     logger.info(report_map)
+
+    #     print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
+    #           str(len(documents_as_sec_code.keys())))
+    #     share_price_map = share_price_search(
+    #         list(documents_as_sec_code.keys()))
+
+    #     result_json = create_due_deligence_json(
+    #         documents_as_sec_code, report_map, share_price_map)
+    #     presenter = inject.instance(ResultPresenter)
+    #     presenter.print(result_json)
 
 
 def as_sec_code(document_list: List[Document]):
@@ -121,9 +114,6 @@ def create_due_deligence_json(documents_as_sec_code, report_map, share_price_map
                 continue
             report = report_map[document.doc_id()]
             underpriced = _underpriced(stock_price, report.value_per_share())
-            # print('1株あたりの価値', report.value_per_share(), '(円)')
-            # print('自己資本比率', report.capital_ratio())
-            # print('安全圏', underpriced, '(%)')
             due_deligence = {
                 'isError': False,
                 'date': str(document.date()),

@@ -23,7 +23,6 @@ ITEMS = {
 
 class SimpleDeligenceService(DeligenceService):
     def __init__(self):
-        self._repo = inject.instance(ReportRepository)
         self._downloader = inject.instance(XbrlDownloader)
 
     def search(self, doc_id_list: List[str]):
@@ -37,11 +36,6 @@ class SimpleDeligenceService(DeligenceService):
         return deligence_map
 
     def _get_deligence(self, doc_id: str):
-        # あとでリポジトリ.findを入れる
-        deligence = self._repo.find(doc_id)
-        if deligence is not None:
-            return deligence
-
         edinet_obj = self._downloader.get(doc_id)
 
         # XBRLの解析
@@ -51,8 +45,6 @@ class SimpleDeligenceService(DeligenceService):
             return None
 
         deligence = Deligence.contruct_by_xbrl_dict(doc_id, xbrl_dict)
-        self._repo.insert(deligence)
-        # deligence_repository.insert(deligence)
         return deligence
 
 
@@ -93,23 +85,5 @@ class XbrlDownloader(object):
         """
         指定されたdocIDをもとにxbrlファイルをダウンロードして、
         その中身をXbrlEdinetParserでparseしたものを返却する
-        """
-        raise NotImplementedError
-
-
-class ReportRepository(object):
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def find(self, doc_id):
-        """
-        指定されたdoc_idに一致するdeligenceテーブルのレコードを返す
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def insert(self, deligence: Deligence):
-        """
-        指定されたDeligenceを記録する
         """
         raise NotImplementedError
