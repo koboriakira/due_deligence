@@ -8,6 +8,8 @@ def test_edinet_obj_wrapper():
     assert get_value_dict('S100IC6Q')
     assert get_value_dict('S100FRGF')
     assert get_value_dict('S100ICAI')
+    assert get_value_dict('S100I8Y1')
+    assert get_value_dict('S100IB07')
 
 
 def get_value_dict(filename: str):
