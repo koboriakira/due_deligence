@@ -16,8 +16,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--date', help='YYYY-MM-DD形式で指定。指定された日付に共有された有価証券報告書を解析します。', type=str, default='')
-    # parser.add_argument(
-    #     '--code', help='企業コードを指定。指定された企業の有価証券報告書を解析します。カンマ区切りで複数指定できます', type=str)
     parser.add_argument(
         '--output', help='結果の出力先を指定します。\nCSV出力またはjson出力の場合に有効になります。', type=str, default='')
     parser.add_argument(

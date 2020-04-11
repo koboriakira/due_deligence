@@ -42,13 +42,17 @@ def scrape_stock_price(sec_code: str):
 
 
 def scrape_value(sec_code: str):
-    yahoo_stock_url = get_yahoo_stock_url(sec_code)
-    response = calm_requests.get(yahoo_stock_url)
+    url = get_url(sec_code)
+    response = get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     return soup.select('.m-stockPriceElm dl .now')[0].text.strip()
 
 
-def get_yahoo_stock_url(sec_code: str):
+def get(url: str):
+    response = calm_requests.get(url)
+
+
+def get_url(sec_code: str):
     return 'https://www.nikkei.com/nkd/company/?scode=' + sec_code
 
 
