@@ -9,12 +9,13 @@ import inject
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Optional
 from tqdm import tqdm
+from due_deligence.filtering.result_filter import ResultFilter
 
 logger = getLogger(__name__)
 
 
 class DDController:
-    def __init__(self, from_date: date, end_date: Optional[date] = None, sec_code_list: List[str] = []):
+    def __init__(self, from_date: date, end_date: Optional[date] = None, sec_code_list: List[str] = [], filters: List[ResultFilter] = []):
         self._from_date = from_date
         if end_date is None:
             self._end_date = copy(from_date)
@@ -25,6 +26,7 @@ class DDController:
         self._document_service = inject.instance(DocumentService)
         self._deligence_service = inject.instance(DeligenceService)
         self._stock_service = inject.instance(StockService)
+        self._filters = filters
 
     def execute(self) -> Dict:
         # if len(self._sec_code_list) > 0:
@@ -44,8 +46,11 @@ class DDController:
         stock_map = self._stock_service.search(
             list(documents_as_sec_code.keys()))
 
-        return create_due_deligence_dict(
+        results = create_due_deligence_dict(
             documents_as_sec_code, report_map, stock_map)
+        for f in self._filters:
+            results = f.filter(results)
+        return results
 
     # def _pattern2(self, sec_code_list: List[str]):
     #     document_list = self._document_service.search_by_sec_code(

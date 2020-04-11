@@ -6,6 +6,8 @@ import inject
 import argparse
 
 from datetime import date
+from due_deligence.filtering.result_filter import ResultFilter
+from due_deligence.filtering.result_underpriced_filter import ResultUnderpricedFilter
 from due_deligence.controller import dd_controller
 from due_deligence.myconfig import myconfig, inject_config
 
@@ -20,6 +22,8 @@ def main():
         '--output', help='結果の出力先を指定します。\nCSV出力またはjson出力の場合に有効になります。', type=str, default='')
     parser.add_argument(
         '--format', help='結果の出力形式を指定します。CSV出力、json出力から選択できます。\n指定しない場合は標準出力されます。', choices=['csv', 'json'], default='screen')
+    parser.add_argument(
+        '--underpriced', help='指定した割安度より割安な企業に絞り込みます', type=int, default=-1)
     parser.add_argument('--debug', help='開発者モード', type=bool, default=False)
     args = parser.parse_args()
 
@@ -35,10 +39,13 @@ def main():
 
     # 処理の実行
     target_date_str = args.date if len(args.date) > 0 else str(date.today())
-
+    filters = []
+    if args.underpriced > 0:
+        filters.append(ResultUnderpricedFilter(args.underpriced))
     try:
         target_date = date.fromisoformat(target_date_str)
-        controller = dd_controller.DDController(target_date)
+        controller = dd_controller.DDController(
+            from_date=target_date, filters=filters)
         result = controller.execute()
 
         presenter = inject.instance(dd_controller.ResultPresenter)

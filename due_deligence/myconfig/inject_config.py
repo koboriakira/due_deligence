@@ -8,7 +8,7 @@ from due_deligence.adapter.deligence import SimpleDeligenceService, XbrlDownload
 from due_deligence.domain_model.stock import StockService
 from due_deligence.adapter.stock import SimpleStockService
 from due_deligence.adapter.http.xbrl_obj_downloader import XbrlObjDownloader
-from due_deligence.controller.dd_controller import ResultPresenter
+from due_deligence.controller.dd_controller import ResultPresenter, ResultFilter
 from due_deligence.adapter.presenter.result_screen_presenter import ResultScreenPresenter
 from due_deligence.adapter.presenter.result_json_presenter import ResultJsonPresenter
 from due_deligence.adapter.presenter.result_today_recommend_presenter import ResultTodayRecommendPresenter
