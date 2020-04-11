@@ -13,6 +13,7 @@ mysqlclient==1.4.6
 ordereddict==1.1
 packaging==20.3
 pep8==1.7.1
+percache==0.4.4
 pluggy==0.13.1
 py==1.8.1
 pyparsing==2.4.6

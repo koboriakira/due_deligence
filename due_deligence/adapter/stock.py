@@ -19,36 +19,43 @@ class SimpleStockService(StockService):
         stock_map = {}
         for i in self._progress_presenter.wrap_tqdm(range(len(sec_code_list))):
             sec_code = sec_code_list[i]
-            share_price = scrape_stock_price(sec_code)
-            if share_price is not None:
-                stock = Stock(share_price)
+            stock = self._get_stock(sec_code)
+            if stock is not None:
                 stock_map[sec_code] = stock
         return stock_map
 
-
-def scrape_stock_price(sec_code: str):
-    try:
-        value = scrape_value(sec_code)
-        return to_int(value)
-    except IndexError:
-        logger.warning('現在の株価が取得できませんでした')
-        return None
-    except ValueError:
-        logger.warning('現在の株価が存在しませんでした')
-        return None
-    except:
-        logger.error('その他エラー')
-        return None
-
-
-def scrape_value(sec_code: str):
-    yahoo_stock_url = get_yahoo_stock_url(sec_code)
-    response = calm_requests.get(yahoo_stock_url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    return soup.select('.m-stockPriceElm dl .now')[0].text.strip()
+    def _get_stock(self, sec_code: str) -> Stock:
+        try:
+            soup = get_soup(sec_code)
+            share_price = get_share_price(soup)
+            return Stock(share_price)
+        except IndexError:
+            logger.warning('現在の株価が取得できませんでした')
+            return None
+        except ValueError:
+            logger.warning('現在の株価が存在しませんでした')
+            return None
+        except:
+            logger.error('その他エラー')
+            return None
 
 
-def get_yahoo_stock_url(sec_code: str):
+def get_soup(sec_code: str):
+    url = get_url(sec_code)
+    response = get(url)
+    return BeautifulSoup(response.text, 'html.parser')
+
+
+def get_share_price(soup: BeautifulSoup) -> int:
+    value = soup.select('.m-stockPriceElm dl .now')[0].text.strip()
+    return to_int(value)
+
+
+def get(url: str):
+    return calm_requests.get(url)
+
+
+def get_url(sec_code: str):
     return 'https://www.nikkei.com/nkd/company/?scode=' + sec_code
 
 
