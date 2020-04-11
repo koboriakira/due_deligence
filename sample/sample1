@@ -1,2 +1,3 @@
 #!/bin/zsh
-python -m due_deligence
+duedeli --date=2020-03-01 --underpriced=20
+duedeli --date=2020-03-02 --underpriced=20
