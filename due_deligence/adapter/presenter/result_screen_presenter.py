@@ -11,6 +11,9 @@ class ResultScreenPresenter(object):
             print(
                 f'*************** {sec_code} {filer_name} 株価: {share_price}円 ***************')
             for due_deligence in result[sec_code]['due_deligences']:
+                if due_deligence['isError']:
+                    print('- ファイルの解析に失敗しました。')
+                    continue
                 date = due_deligence['date']
                 value_per_share = due_deligence['valueParShare']
                 capital_ratio = due_deligence['capitalRatio']
