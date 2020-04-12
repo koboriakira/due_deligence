@@ -24,7 +24,7 @@ class SimpleDocumentService(DocumentService):
         target_date = copy(from_date)
 
         result = []
-        dt = from_date - end_date
+        dt = end_date - from_date
         for i in self._progress_presenter.wrap_tqdm(range(dt.days + 1)):
             # while from_date <= target_date and target_date <= end_date:
             document_list = self._search_document(target_date)

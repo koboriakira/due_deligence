@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 import inject
 from logging import getLogger
 import traceback
-from typing import List
+from typing import List, Union
 from tqdm import tqdm
 
 from due_deligence.domain_model.deligence import Deligence, DeligenceService
@@ -18,7 +18,7 @@ ITEMS = {
     '当期流動負債合計': [['jppfs_cor:CurrentLiabilities', 'CurrentYearInstant'], ['jppfs_cor:CurrentLiabilities', 'CurrentYearInstant_NonConsolidatedMember']],
     '当期固定負債合計': [['jppfs_cor:NoncurrentLiabilities', 'CurrentYearInstant'], ['jppfs_cor:NoncurrentLiabilities', 'CurrentYearInstant_NonConsolidatedMember']],
     '当期純資産合計': [['jppfs_cor:NetAssets', 'CurrentYearInstant'], ['jppfs_cor:NetAssets', 'CurrentYearInstant_NonConsolidatedMember']],
-    '当期発行済株式総数': [['jpcrp_cor:TotalNumberOfIssuedSharesSummaryOfBusinessResults', 'CurrentYearInstant_NonConsolidatedMember']],
+    '当期発行済株式総数': [['jpcrp_cor:TotalNumberOfIssuedSharesSummaryOfBusinessResults', 'CurrentYearInstant_NonConsolidatedMember'], ['jpcrp030000-asr_E35323-000:TotalNumberOfIssuedSharesCommonStockSummaryOfBusinessResults', 'CurrentYearInstant_NonConsolidatedMember']],
 }
 
 
@@ -61,6 +61,10 @@ class EdinetObjWrapper:
                 key_and_ref_list = ITEMS[item_name]
                 item_value = self._get_item_value(key_and_ref_list)
                 if item_value is None:
+                    # 当期固定負債合計は存在しない場合がある
+                    if item_name == '当期固定負債合計':
+                        value_dict[item_name] = 0
+                        continue
                     logger.error('取得できない項目がありました: %s' % item_name)
                     return False
                 value_dict[item_name] = item_value
@@ -69,7 +73,7 @@ class EdinetObjWrapper:
             logger.exception('例外が発生しました。 %s', e)
             return False
 
-    def _get_item_value(self, key_and_ref_list):
+    def _get_item_value(self, key_and_ref_list) -> Union[str, int]:
         for key_and_ref in key_and_ref_list:
             key = key_and_ref[0]
             context_ref = key_and_ref[1]

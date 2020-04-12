@@ -1,3 +1,4 @@
 **/__pycache__
 due_deligence.egg-info/
 dist/
+.duedeli_request_cache
