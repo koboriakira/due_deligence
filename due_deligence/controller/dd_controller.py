@@ -29,10 +29,6 @@ class DDController:
         self._filters = filters
 
     def execute(self) -> Dict:
-        # if len(self._sec_code_list) > 0:
-        #     self._pattern2(self._sec_code_list)
-        #     return
-
         document_list = self._document_service.search(
             self._from_date, self._end_date)
         documents_as_sec_code = as_sec_code(document_list)
@@ -42,7 +38,6 @@ class DDController:
         report_map = self._deligence_service.search(doc_id_list)
         logger.debug(report_map)
 
-        # todo: service化する？
         stock_map = self._stock_service.search(
             list(documents_as_sec_code.keys()))
 
@@ -51,26 +46,6 @@ class DDController:
         for f in self._filters:
             results = f.filter(results)
         return results
-
-    # def _pattern2(self, sec_code_list: List[str]):
-    #     document_list = self._document_service.search_by_sec_code(
-    #         sec_code_list)
-    #     documents_as_sec_code = as_sec_code(document_list)
-    #     logger.info(documents_as_sec_code)
-
-    #     doc_id_list = get_doc_id_list(document_list)
-    #     report_map = self._deligence_service.search(doc_id_list)
-    #     logger.info(report_map)
-
-    #     print('- 現在の株価を取得していきます。%s秒かかる想定です。' %
-    #           str(len(documents_as_sec_code.keys())))
-    #     share_price_map = share_price_search(
-    #         list(documents_as_sec_code.keys()))
-
-    #     result_json = create_due_deligence_json(
-    #         documents_as_sec_code, report_map, share_price_map)
-    #     presenter = inject.instance(ResultPresenter)
-    #     presenter.print(result_json)
 
 
 def as_sec_code(document_list: List[Document]):
@@ -146,50 +121,12 @@ class ResultPresenter(object):
 # 以下はリファクタして消す予定。
 
 
-def _underpriced(stock_price, value_per_share):
+def _underpriced(stock_price: int, value_per_share: int) -> int:
     """
     安全圏、割安度を確認
     """
-    return round(100 * stock_price / value_per_share, 0)
-
-
-def share_price_search(sec_code_list: List[str]):
-    share_price_map = {}
-    for i in tqdm(range(len(sec_code_list))):
-        sec_code = sec_code_list[i]
-        share_price = scrape_stock_price(sec_code)
-        if share_price is not None:
-            share_price_map[sec_code] = share_price
-    return share_price_map
-
-
-def scrape_stock_price(sec_code: str):
     try:
-        value = scrape_value(sec_code)
-        return to_int(value)
-    except IndexError:
-        logger.warning('現在の株価が取得できませんでした')
-        return None
-    except ValueError:
-        logger.warning('現在の株価が存在しませんでした')
-        return None
-    except:
-        logger.error('その他エラー')
-        return None
-
-
-def scrape_value(sec_code: str):
-    from due_deligence.util import calm_requests
-    from bs4 import BeautifulSoup
-    yahoo_stock_url = get_yahoo_stock_url(sec_code)
-    response = calm_requests.get(yahoo_stock_url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    return soup.select('.m-stockPriceElm dl .now')[0].text.strip()
-
-
-def get_yahoo_stock_url(sec_code: str):
-    return 'https://www.nikkei.com/nkd/company/?scode=' + sec_code
-
-
-def to_int(value: str):
-    return int(float(value.replace(',', '').replace('円', '').strip()))
+        return round(100 * stock_price / value_per_share, 0)
+    except ZeroDivisionError as e:
+        logger.warning('ゼロ除算')
+        return 0

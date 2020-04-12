@@ -15,6 +15,8 @@ class SimpleStockService(StockService):
         self._progress_presenter = inject.instance(ProgressPresenter)
 
     def search(self, sec_code_list: List[str]) -> Dict:
+        if len(sec_code_list) == 0:
+            return {}
         self._progress_presenter.print('- 現在の株価を取得していきます')
         stock_map = {}
         for i in self._progress_presenter.wrap_tqdm(range(len(sec_code_list))):
