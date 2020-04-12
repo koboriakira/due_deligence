@@ -15,19 +15,23 @@ from due_deligence.adapter.presenter.result_today_recommend_presenter import Res
 from due_deligence.util.progress_presenter import ProgressPresenter
 from due_deligence.adapter.presenter.cli_progress_presenter import CliProgressPresenter
 from due_deligence.adapter.presenter.null_progress_presenter import NullProgressPresenter
+from due_deligence.adapter.http.requests import Requests
+from due_deligence.adapter.http.cache_requests import CacheRequests
 
 __DEFAULT_OUTPUT_FILEPATH = './due_deligence'
 
 __output_path = ''
 __format = ''
 __is_cli = False
+__is_cache = False
 
 
-def init_injection(output_path='', format_type='', is_cli=False):
-    global __output_path, __format, __is_cli
+def init_injection(output_path='', format_type='', is_cli=False, is_cache=False):
+    global __output_path, __format, __is_cli, __is_cache
     __output_path = output_path
     __format = format_type
     __is_cli = is_cli
+    __is_cache = is_cache
     inject.configure(config)
 
 
@@ -47,3 +51,5 @@ def config(binder):
         binder.bind_to_constructor(ProgressPresenter, CliProgressPresenter)
     else:
         binder.bind_to_constructor(ProgressPresenter, NullProgressPresenter)
+    if __is_cache:
+        binder.bind(Requests, CacheRequests(wait_time=2))
