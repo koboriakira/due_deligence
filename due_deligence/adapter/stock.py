@@ -30,9 +30,7 @@ class SimpleStockService(StockService):
     def _get_stock(self, sec_code: str) -> Stock:
         try:
             soup = self._get_soup(sec_code)
-            print(type(soup))
             share_price = self._get_share_price(soup)
-            print(share_price)
             return Stock(share_price)
         except IndexError:
             logger.warning('現在の株価が取得できませんでした')
