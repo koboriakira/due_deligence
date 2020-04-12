@@ -25,6 +25,7 @@ WORKDIR /work
 ADD ./due_deligence due_deligence
 ADD ./requirements.txt requirements.txt
 ADD ./setup.py setup.py
+ADD ./.duedeli_request_cache .duedeli_request_cache
 ADD ./MANIFEST.in MANIFEST.in
 
 # Pythonの必要なモジュールをインストール
