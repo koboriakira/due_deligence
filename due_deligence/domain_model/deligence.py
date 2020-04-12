@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from datetime import date
+from typing import Dict
 
 
 class Deligence:
@@ -84,5 +85,5 @@ class DeligenceService(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def search(self, doc_id_list):
+    def search(self, doc_id_list) -> Dict:
         raise NotImplementedError
