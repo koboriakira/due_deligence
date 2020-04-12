@@ -7,14 +7,15 @@ from typing import List
 from tqdm import tqdm
 
 from due_deligence.domain_model.document import Document, DocumentService
-from due_deligence.util import calm_requests as requests
 from due_deligence.util.progress_presenter import ProgressPresenter
+from due_deligence.adapter.http.requests import Requests
 
 
 class SimpleDocumentService(DocumentService):
 
     def __init__(self):
         self._progress_presenter = inject.instance(ProgressPresenter)
+        self._requests = inject.instance(Requests)
 
     def search(self, from_date: date, end_date: date) -> List[Document]:
         """
@@ -41,7 +42,7 @@ class SimpleDocumentService(DocumentService):
 
     def _search_document(self, target_date: date) -> List[Document]:
         list_url = self._get_list_url(str(target_date))
-        response = requests.get(list_url)
+        response = self._requests.get(list_url)
         json_dict = json.loads(response.text)
 
         document_list = []

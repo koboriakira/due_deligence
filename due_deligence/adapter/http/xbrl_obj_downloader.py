@@ -3,16 +3,20 @@ import random
 import string
 import zipfile
 import os
+import inject
 from typing import List
 from edinet_xbrl.edinet_xbrl_parser import EdinetXbrlParser
 
-from due_deligence.util import calm_requests as requests
 from due_deligence.adapter.deligence import XbrlDownloader, EdinetObjWrapper
+from due_deligence.adapter.http.requests import Requests
 
 DIR = 'tmp'
 
 
 class XbrlObjDownloader(object):
+    def __init__(self):
+        self._requests = inject.instance(Requests)
+
     def get(self, doc_id: str) -> EdinetObjWrapper:
         detail_url = self._generate_doc_url(doc_id)
 
@@ -37,7 +41,7 @@ class XbrlObjDownloader(object):
 
         filename = randomname(10)
         filepath = '/' + DIR + '/' + filename + '.zip'
-        r = requests.get(url)
+        r = self._requests.get(url)
         with open(filepath, 'wb') as f:
             for chunk in r.iter_content(chunk_size=1024):
                 if chunk:

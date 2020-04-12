@@ -30,6 +30,8 @@ def main():
         '--capital', help='自己資本比率が指定した割合より高い企業に絞り込みます', type=int, default=-1)
     parser.add_argument(
         '--price', help='指定した値より安い株価の企業に絞り込みます', type=int, default=-1)
+    parser.add_argument(
+        '--cache', help='スクレイピング結果をキャッシュします。容量が大きくなるため非推奨です', type=bool, default=False)
     parser.add_argument('--debug', help='開発者モード', type=bool, default=False)
     args = parser.parse_args()
 
@@ -41,12 +43,12 @@ def main():
 
     # 依存制御の設定
     inject_config.init_injection(
-        output_path=args.output, format_type=args.format, is_cli=True)
+        output_path=args.output, format_type=args.format, is_cli=True, is_cache=args.cache)
 
     # 処理の実行
-    target_dates = extract_date(args.date)
-    filters = prepare_filters(args.underpriced, args.capital, args.price)
     try:
+        target_dates = extract_date(args.date)
+        filters = prepare_filters(args.underpriced, args.capital, args.price)
         controller = dd_controller.DDController(
             from_date=target_dates[0], end_date=target_dates[1], filters=filters)
         result = controller.execute()
