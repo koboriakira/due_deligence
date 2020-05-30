@@ -11,6 +11,7 @@ from due_deligence.adapter.http.xbrl_obj_downloader import XbrlObjDownloader
 from due_deligence.controller.dd_controller import ResultPresenter, ResultFilter
 from due_deligence.adapter.presenter.result_screen_presenter import ResultScreenPresenter
 from due_deligence.adapter.presenter.result_json_presenter import ResultJsonPresenter
+from due_deligence.adapter.presenter.result_slack_presenter import ResultSlackPresenter
 from due_deligence.adapter.presenter.result_today_recommend_presenter import ResultTodayRecommendPresenter
 from due_deligence.util.progress_presenter import ProgressPresenter
 from due_deligence.adapter.presenter.cli_progress_presenter import CliProgressPresenter
@@ -46,6 +47,8 @@ def config(binder):
         path = __output_path if len(
             __output_path) > 0 else __DEFAULT_OUTPUT_FILEPATH + '.json'
         binder.bind(ResultPresenter, ResultJsonPresenter(path))
+    elif __format == 'slack':
+        binder.bind_to_constructor(ResultPresenter, ResultSlackPresenter)
     # 指定されたパスへのcsvやjson出力にも対応させる。
     if __is_cli:
         binder.bind_to_constructor(ProgressPresenter, CliProgressPresenter)

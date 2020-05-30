@@ -11,7 +11,7 @@ from due_deligence.filtering.result_underpriced_filter import ResultUnderpricedF
 from due_deligence.filtering.result_capital_ratio_filter import ResultCapitalRatioFilter
 from due_deligence.filtering.result_stock_price_filter import ResultStockPriceFilter
 from due_deligence.controller import dd_controller
-from due_deligence.myconfig import myconfig, inject_config
+from due_deligence.myconfig import myconfig, inject_config, dotenv
 
 # CUIで `duedeli` を実行したときの最初の入口がこれ
 
@@ -23,7 +23,7 @@ def main():
     parser.add_argument(
         '--output', help='結果の出力先を指定します。\nCSV出力またはjson出力の場合に有効になります。', type=str, default='')
     parser.add_argument(
-        '--format', help='結果の出力形式を指定します。CSV出力、json出力から選択できます。\n指定しない場合は標準出力されます。', choices=['csv', 'json'], default='screen')
+        '--format', help='結果の出力形式を指定します。CSV出力、json出力から選択できます。\n指定しない場合は標準出力されます。', choices=['csv', 'json', 'slack'], default='screen')
     parser.add_argument(
         '--underpriced', help='指定した割安度より割安な企業に絞り込みます', type=int, default=-1)
     parser.add_argument(
