@@ -15,7 +15,7 @@ packaging==20.3
 pep8==1.7.1
 percache==0.4.4
 pluggy==0.13.1
-py==1.8.1
+py==1.10.0
 pyparsing==2.4.7
 pytest==5.4.1
 python-xbrl==1.1.1
